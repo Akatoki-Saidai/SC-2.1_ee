@@ -29,7 +29,7 @@ void loop() {
       if (i >10){
         i = i+1;
       }
-      else if (i=10){
+      else if (i==10){
         phase = 1;
         forward();
       }
