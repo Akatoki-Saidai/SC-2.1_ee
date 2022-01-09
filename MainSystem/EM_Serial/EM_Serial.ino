@@ -447,6 +447,7 @@ void loop() {
                     
                     phase_state = 4;
                 }
+                break;
 
 
 
@@ -466,6 +467,7 @@ void loop() {
 
                     phase_state = 5;
                 }
+                break;
 
 
 
