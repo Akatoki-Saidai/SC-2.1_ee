@@ -35,9 +35,9 @@ void forward(){
 //後転
 void back(){
   ledcWrite(0, 0);
-    ledcWrite(1, 150);
+    ledcWrite(1, 255);
     ledcWrite(2, 0);
-    ledcWrite(3, 150);
+    ledcWrite(3, 255);
 
 }
 
@@ -81,7 +81,7 @@ void stopping(){
 }
 
 void startphase(){
-  ledcWrite(0, 150);
+  ledcWrite(0, 255);
   ledcWrite(1, 0);
   ledcWrite(2, 0);
   ledcWrite(3, 0);
