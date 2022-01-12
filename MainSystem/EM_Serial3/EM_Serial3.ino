@@ -85,8 +85,8 @@ double current_altitude;
  //those are variables which is used in GPS
   double dis_goal; //ゴールとの距離を表す関数
   double now_dis,now_rad,next_dis,next_rad,delta_rad;  
-  double GOAL_lat = 35.861665;
-  double GOAL_lng = 139.606896;
+  double GOAL_lat = 35.860868333;
+  double GOAL_lng = 139.607136667;
   double omega,delta_lng,distance,azimuth;
   int phase_a = 1;
   int phase_b = 3;
@@ -560,11 +560,15 @@ void loop() {
                     CanSatLogData.println("Phase4: transition completed");    
                     CanSatLogData.flush();
                     */
+                    Serial.print("LAT=");Serial.println(gps_latitude);
+                    Serial.print("LONG=");Serial.println(gps_longitude);
                     now_dis = CalculateDis(GOAL_lng, gps_longitude, gps_latitude);//if(now_dis>3)に入る前に一回これを実行しないと，動かない
                     now_rad = CalculateAngel(GOAL_lng, gps_longitude, gps_latitude);//if(now_dis>3)に入る前に一回これを実行しないと，動かない
                     phase_state = 4;
                 }
-
+                
+                    Serial.print("LAT=");Serial.println(gps_latitude,9);
+                    Serial.print("LONG=");Serial.println(gps_longitude,9);
               
                 //距離が遠いときはGPS利用
                 if(now_dis > 3){

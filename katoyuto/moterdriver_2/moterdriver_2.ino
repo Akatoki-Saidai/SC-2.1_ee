@@ -17,7 +17,7 @@ void loop() {
   if (phase ==1){
     forward();
     Serial.println("rottating");
-    delay(20000);
+    delay(40000);
     phase=2;
   }
   else if (phase==2){
