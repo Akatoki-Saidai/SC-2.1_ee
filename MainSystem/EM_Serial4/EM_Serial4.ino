@@ -594,6 +594,7 @@ void loop() {
                             forward();
                             Serial.println("-----------------------");
                             Serial.println("FORWARD PHASE");
+                            Serial.print("GPS TIME:");Serial.println(gps_time);
                             Serial.print("DISTANCE[m]=");Serial.println(now_dis);
                             Serial.print("VELOCITY[m/s]=");Serial.println(gps_velocity);
                             Serial.println("moving");
@@ -610,6 +611,7 @@ void loop() {
                         case 4:
                           Serial.println("-----------------------");
                           Serial.println("STOPPING PHASE");
+                          Serial.print("GPS TIME:");Serial.println(gps_time);
                           Serial.println("stopping");
                           stopping();
                           phase_b = 3;
@@ -640,6 +642,8 @@ void loop() {
                                 leftturn();
                                 Serial.println("-----------------------");
                                 Serial.println("TURNING PHASE");
+                                Serial.print("GPS TIME:");Serial.println(gps_time);
+                                Serial.print("DELTA RAD(>0):");Serial.println(delta_rad);
                                 Serial.println("turning left");
                                 previousMillis = currentMillis;
                                 forward_phase = 3;
@@ -673,6 +677,8 @@ void loop() {
                                 rightturn();
                                 Serial.println("-----------------------");
                                 Serial.println("TURNING PHASE");
+                                Serial.print("GPS TIME:");Serial.println(gps_time);
+                                Serial.print("DELTA RAD(<0):");Serial.println(delta_rad);
                                 Serial.println("turning right");
                                 previousMillis = currentMillis;
                                 forward_phase = 3;
