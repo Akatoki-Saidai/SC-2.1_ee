@@ -18,7 +18,7 @@ int Datanumber = 0;
 int type = 1;
 int yeah = 1;
 int type_state = 0;
-int cutparac = 33;                  //切り離し用トランジスタのピン番号の宣言
+int cutparac = 23;                  //切り離し用トランジスタのピン番号の宣言
 int outputcutsecond = 5;            //切り離し時の9V電圧を流す時間，単位はsecond
 float time3_1,time3_2,St_Time;      //時間に関するもの
 float Accel[6];                     //計測した値をおいておく関数
@@ -211,6 +211,13 @@ void stopping(){
     //Serial.println("hello");
     stoppage();
   }*/
+    for(int i=255;i>0;i=i-5){
+      ledcWrite(0,i);
+      ledcWrite(1,0);
+      ledcWrite(2,i);
+      ledcWrite(3,0);
+      delay(50);//stoppingではdelay使う
+    }
 }
 
 void setup() {
@@ -601,9 +608,12 @@ void loop() {
                           break;
                           
                         case 4:
+                          Serial.println("-----------------------");
+                          Serial.println("STOPPING PHASE");
+                          Serial.println("stopping");
+                          stopping();
                           phase_b = 3;
                           forward_phase = 1;
-                          i = 255;
                           phase_a = 2;
                           break;
                       }
@@ -641,10 +651,9 @@ void loop() {
                               }
                               break;
     
-                            case 4:
+                            case 4:                           
                               phase_b = 3;
                               forward_phase = 1;
-                              i = 255;
                               phase_a = 1;
                               break;
                           }
@@ -678,7 +687,6 @@ void loop() {
                             case 4:
                               phase_b = 3;
                               forward_phase = 1;
-                              i = 255;
                               phase_a = 1;
                               break;
                         }
