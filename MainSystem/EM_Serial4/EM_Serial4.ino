@@ -568,8 +568,8 @@ void loop() {
                     CanSatLogData.println("Phase4: transition completed");    
                     CanSatLogData.flush();
                     */
-                    Serial.print("LAT(START):");Serial.println(gps_latitude,9);
-                    Serial.print("LONG(START):");Serial.println(gps_longitude,9);
+                    Serial.print("LAT(PHASE4_START):");Serial.println(gps_latitude,9);
+                    Serial.print("LONG(PHASE4_START):");Serial.println(gps_longitude,9);
                     now_dis = CalculateDis(GOAL_lng, gps_longitude, gps_latitude);//if(now_dis>3)に入る前に一回これを実行しないと，動かない
                     now_rad = CalculateAngel(GOAL_lng, gps_longitude, gps_latitude);//if(now_dis>3)に入る前に一回これを実行しないと，動かない
                     phase_state = 4;
@@ -727,6 +727,8 @@ void loop() {
                     /*CanSatLogData.println(gps_time);
                     CanSatLogData.println("Phase5: transition completed");    
                     CanSatLogData.flush();*/
+                    Serial.print("LAT(PHASE5_START):");Serial.println(gps_latitude,9);
+                    Serial.print("LONG(PHASE5_START):");Serial.println(gps_longitude,9);
 
                     phase_state = 5;
                 }
