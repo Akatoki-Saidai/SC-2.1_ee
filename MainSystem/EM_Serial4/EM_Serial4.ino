@@ -568,6 +568,8 @@ void loop() {
                     CanSatLogData.println("Phase4: transition completed");    
                     CanSatLogData.flush();
                     */
+                    Serial.print("LAT(START):");Serial.println(gps_latitude,9);
+                    Serial.print("LONG(START):");Serial.println(gps_longitude,9);
                     now_dis = CalculateDis(GOAL_lng, gps_longitude, gps_latitude);//if(now_dis>3)に入る前に一回これを実行しないと，動かない
                     now_rad = CalculateAngel(GOAL_lng, gps_longitude, gps_latitude);//if(now_dis>3)に入る前に一回これを実行しないと，動かない
                     phase_state = 4;
@@ -597,6 +599,8 @@ void loop() {
                             Serial.print("GPS TIME:");Serial.println(gps_time);
                             Serial.print("DISTANCE[m]=");Serial.println(now_dis);
                             Serial.print("VELOCITY[m/s]=");Serial.println(gps_velocity);
+                            Serial.print("LAT:");Serial.println(gps_latitude,9);
+                            Serial.print("LONG:");Serial.println(gps_longitude,9);
                             Serial.println("moving");
                             previousMillis = currentMillis;
                             forward_phase = 3;
@@ -612,6 +616,8 @@ void loop() {
                           Serial.println("-----------------------");
                           Serial.println("STOPPING PHASE");
                           Serial.print("GPS TIME:");Serial.println(gps_time);
+                          Serial.print("LAT:");Serial.println(gps_latitude,9);
+                          Serial.print("LONG:");Serial.println(gps_longitude,9);
                           Serial.println("stopping");
                           stopping();
                           phase_b = 3;
@@ -644,6 +650,8 @@ void loop() {
                                 Serial.println("TURNING PHASE");
                                 Serial.print("GPS TIME:");Serial.println(gps_time);
                                 Serial.print("DELTA RAD(>0):");Serial.println(delta_rad);
+                                Serial.print("LAT:");Serial.println(gps_latitude,9);
+                                Serial.print("LONG:");Serial.println(gps_longitude,9);
                                 Serial.println("turning left");
                                 previousMillis = currentMillis;
                                 forward_phase = 3;
@@ -679,6 +687,8 @@ void loop() {
                                 Serial.println("TURNING PHASE");
                                 Serial.print("GPS TIME:");Serial.println(gps_time);
                                 Serial.print("DELTA RAD(<0):");Serial.println(delta_rad);
+                                Serial.print("LAT:");Serial.println(gps_latitude,9);
+                                Serial.print("LONG:");Serial.println(gps_longitude,9);
                                 Serial.println("turning right");
                                 previousMillis = currentMillis;
                                 forward_phase = 3;
