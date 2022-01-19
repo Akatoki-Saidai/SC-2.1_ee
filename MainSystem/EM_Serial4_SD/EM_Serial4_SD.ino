@@ -617,6 +617,7 @@ void loop() {
                             CanSatLogData.print("VELOCITY[m/s]=");CanSatLogData.println(gps_velocity);      
                             CanSatLogData.print("LAT:");CanSatLogData.println(gps_latitude,9);
                             CanSatLogData.print("LONG:");CanSatLogData.println(gps_longitude,9);
+                            CanSatLogData.println("moving for 1000[ms]"); 
                             CanSatLogData.flush();
                             previousMillis = currentMillis;
                             forward_phase = 3;
@@ -640,7 +641,8 @@ void loop() {
                           CanSatLogData.println(gps_time);
                           CanSatLogData.println("STOPPING PHASE");
                           CanSatLogData.print("LAT:");CanSatLogData.println(gps_latitude,9);
-                          CanSatLogData.print("LONG:");CanSatLogData.println(gps_longitude,9);      
+                          CanSatLogData.print("LONG:");CanSatLogData.println(gps_longitude,9);   
+                          CanSatLogData.println("stopping");      
                           CanSatLogData.flush();
                           stopping();
                           phase_b = 3;
@@ -683,7 +685,7 @@ void loop() {
                                 CanSatLogData.print("DELTA RAD(>0)=");CanSatLogData.println(delta_rad);   
                                 CanSatLogData.print("LAT:");CanSatLogData.println(gps_latitude,9);
                                 CanSatLogData.print("LONG:");CanSatLogData.println(gps_longitude,9);  
-                                CanSatLogData.println("turning left");   
+                                CanSatLogData.print("turning left for ");CanSatLogData.print(delta_rad * M_2_PI * 1000);CanSatLogData.println("[ms]");
                                 CanSatLogData.flush();
 
                                 
@@ -731,7 +733,7 @@ void loop() {
                                 CanSatLogData.print("DELTA RAD(<0)=");CanSatLogData.println(delta_rad);   
                                 CanSatLogData.print("LAT:");CanSatLogData.println(gps_latitude,9);
                                 CanSatLogData.print("LONG:");CanSatLogData.println(gps_longitude,9);  
-                                CanSatLogData.println("turning right");   
+                                CanSatLogData.print("turning right for ");CanSatLogData.print(abs(delta_rad) * M_2_PI * 1000);CanSatLogData.println("[ms]");  
                                 CanSatLogData.flush();
                                 previousMillis = currentMillis;
                                 forward_phase = 3;
@@ -771,8 +773,9 @@ void loop() {
                     //LogDataの保存
                     CanSatLogData.println(gps_time);
                     CanSatLogData.println("Phase5: transition completed");  
-                    CanSatLogData.print("LAT(PHASE4_START):");CanSatLogData.println(gps_latitude,9);
-                    CanSatLogData.print("LONG(PHASE4_START):");CanSatLogData.println(gps_longitude,9);       
+                    CanSatLogData.print("LAT(PHASE5_START):");CanSatLogData.println(gps_latitude,9);
+                    CanSatLogData.print("LONG(PHASE5_START):");CanSatLogData.println(gps_longitude,9);       
+                    CanSatLogData.print("DISTANCE[m]=");CanSatLogData.println(now_dis);
                     CanSatLogData.flush();
 
                     phase_state = 5;
