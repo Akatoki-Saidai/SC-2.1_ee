@@ -89,8 +89,8 @@ double current_altitude;
  //those are variables which is used in GPS
   double dis_goal; //ゴールとの距離を表す関数
   double now_dis,now_rad,next_dis,next_rad,delta_rad;  
-  double GOAL_lat = 35.861665;
-  double GOAL_lng = 139.606896;
+  double GOAL_lat = 35.861281667;
+  double GOAL_lng = 139.607058333;
   double omega,delta_lng,distance,azimuth;
   int phase_a = 1;
   int phase_b = 3;
@@ -226,12 +226,12 @@ void stopping(){
 
 void setup() {
     Serial1.begin(9600, SERIAL_8N1, 5, 18);
-    /*// SD Card initialization
+    //SD Card initialization
     SPI.begin(sck,miso,mosi,ss);
     SD.begin(ss,SPI);
     CanSatLogData = SD.open("/CanSatLogData.log", FILE_APPEND);
     SensorData = SD.open("/SensorData.bin",FILE_APPEND);
-    */
+    
 
     //割り込み関数
     timer1 = timerBegin(0, 80, true);
@@ -243,8 +243,11 @@ void setup() {
     //Serial.begin(115200, SERIAL_8N1, 16, 17); //関数内の引数はデータ通信レート，unknown，RXピン，TXピン
     Serial.write("TESTING: Serial communication\n");
     Serial.write("TESTING: Serial communication\n");
+    CanSatLogData.println("test");  
+    CanSatLogData.flush();
+    
 
-    /*//LED
+    /*//LED  
     pinMode(launch_PIN, OUTPUT);        //点火用トランジスタの出力宣言
     pinMode(cutparac, OUTPUT);      //切り離し用トランジスタの出力宣言
     digitalWrite(launch_PIN, LOW);      //点火用トランジスタの出力オフ
