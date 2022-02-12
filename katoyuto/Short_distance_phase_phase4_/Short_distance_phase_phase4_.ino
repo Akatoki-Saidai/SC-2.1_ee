@@ -45,7 +45,7 @@ void loop() {
     case 5:
       rotating();
       if(a < 500){
-        pahse = 0;
+        phase = 0;
         stopping();
       }
       break;
