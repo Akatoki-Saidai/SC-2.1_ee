@@ -111,7 +111,7 @@ void forward(){
 }
 
 //ターボ
-void forward(){
+void turbo(){
   ledcWrite(0, 255); //channel, duty
   ledcWrite(1, 0);
   ledcWrite(2, 255);
