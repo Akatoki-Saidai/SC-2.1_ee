@@ -104,6 +104,14 @@ void loop() {
 
 //前進
 void forward(){
+  ledcWrite(0, 127); //channel, duty
+  ledcWrite(1, 0);
+  ledcWrite(2, 127);
+  ledcWrite(3, 0);
+}
+
+//ターボ
+void forward(){
   ledcWrite(0, 255); //channel, duty
   ledcWrite(1, 0);
   ledcWrite(2, 255);
@@ -113,9 +121,9 @@ void forward(){
 //後転
 void back(){
   ledcWrite(0, 0);
-    ledcWrite(1, 150);
+    ledcWrite(1, 63);
     ledcWrite(2, 0);
-    ledcWrite(3, 150);
+    ledcWrite(3, 63);
 
 }
 
@@ -129,7 +137,7 @@ void stoppage(){
 
 //右旋回
 void rightturn(){
-  ledcWrite(0, 150);
+  ledcWrite(0, 63);
   ledcWrite(1, 0);
   ledcWrite(2, 0);
   ledcWrite(3, 0);
@@ -139,7 +147,7 @@ void rightturn(){
 void leftturn(){
   ledcWrite(0, 0);
   ledcWrite(1, 0);
-  ledcWrite(2, 150);
+  ledcWrite(2, 63);
   ledcWrite(3, 0);
 }
 
@@ -164,15 +172,15 @@ void stopping(){
 
 //回転
 void rotating(){
-  ledcWrite(0, 100);
+  ledcWrite(0, 63);
   ledcWrite(1, 0);
   ledcWrite(2, 0);
-  ledcWrite(3, 100);
+  ledcWrite(3, 63);
 }
 //反回転
 void reverse_rotating(){
   ledcWrite(0, 0);
-  ledcWrite(1, 100);
-  ledcWrite(2, 100);
+  ledcWrite(1, 63);
+  ledcWrite(2, 63);
   ledcWrite(3, 0);  
 }
