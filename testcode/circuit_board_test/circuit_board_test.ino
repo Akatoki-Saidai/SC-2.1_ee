@@ -226,7 +226,6 @@ void stopping(){
 //for test
         //超音波
         long a = 0;
-        int phase = 5;
         int count = 0;
         int previous_distance = 0;
         int current_distance;
@@ -237,9 +236,6 @@ void stopping(){
         #define TRIG_PIN 0
         #define ECHO_PIN 4
         SR04 sr04 = SR04(ECHO_PIN,TRIG_PIN);
-        
-        int forward_phase = 1;
-        unsigned long previousMillis = 0;
         
         int Priviousdistance;
         
@@ -408,7 +404,7 @@ void loop() {
          //超音波
         a=sr04.Distance();
         current_distance = a;
-        Serial.print("HC-SR04:")
+        Serial.print("HC-SR04:");
         Serial.println(a);
 
         //GY-271
