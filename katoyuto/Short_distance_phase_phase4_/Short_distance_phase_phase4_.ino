@@ -43,14 +43,19 @@ void loop() {
   Serial.println(a);
   switch(phase){
     case 5:
+      Serial.print("phase(rotating)=");
+      Serial.println(phase);
       rotating();
       if(a < 500){
         phase = 0;
         stopping();
+        Serial.println("STOP!");
       }
       break;
       
     case 0:
+          Serial.print("phase(check_former)=");
+      Serial.println(phase);
         if(abs(current_distance - previous_distance) < EPSILON){
           count++;
         }
@@ -64,6 +69,8 @@ void loop() {
       break;
 
     case 1:
+          Serial.print("phase(forward)=");
+      Serial.println(phase);
       forward();
       delay(5000);
       stopping();
@@ -71,6 +78,8 @@ void loop() {
       break;
 
     case 2:
+          Serial.print("phase(check_later)=");
+      Serial.println(phase);
       if(abs(current_distance - previous_distance) < EPSILON){
         count++;
       }
@@ -83,17 +92,25 @@ void loop() {
       break;
 
     case 3:
+          Serial.print("phase(judge)=");
+      Serial.println(phase);
       if(distance2-distance1<0){
+        if(distance2<5){
+        phase = 4;
+        }
+        else{
         phase = 1;
+        }
       }else if(distance2-distance1>0){
         phase = 5;
-      }else if(distance2<5){
-        phase = 4;
       }
       break;
 
     case 4:
+          Serial.print("phase(goal)=");
+      Serial.println(phase);
       Serial.println("GOAL!");
+      delay(100000000000);
       phase = 6;
       break;
       
