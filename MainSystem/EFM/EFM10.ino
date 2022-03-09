@@ -690,6 +690,7 @@ void loop() {
                   break;
                 }*/
 
+                //GY271のデータの取得
                 Vector norm = compass.readNormalize();
                 switch(phase4){  
                     case 1:
@@ -698,27 +699,35 @@ void loop() {
                     //stopping();
                     Serial.println("stopping!");
 
+                    //変数count カウントが0のときはデータを取るモード，1になったら　移動するモード
                     //GPSとGY271で5回の平均を最初に出す
                     if(count == 0){
                         //CanSatの北からの角度を計算
                         float heading = atan2(norm.YAxis, norm.XAxis);
         
+                        //移動平均のために角度と緯度経度のデータをためる
                         heading_array[count1] = heading;
                         GPSlat_array[count1] = gps_latitude;
                         GPSlng_array[count1] = gps_longitude;
                         if(count1 == 4){
+
+                            //集めたデータの和をだす
                             for(count2=0;count2<5;count2++){
                                 heading_sum = heading_sum + heading_array[count2];
                                 GPSlat_sum  = GPSlat_sum  + GPSlat_array[count2];
                                 GPSlng_sum  = GPSlng_sum  + GPSlng_array[count2];
                             }
+                            //平均値
                             heading_data = heading_sum / 5;
                             GPSlat_data  = GPSlat_sum  / 5;
                             GPSlng_data   = GPSlat_sum  / 5;
+                            //初めのデータをあつめ終わったのでカウントを1にする
                             count = 1;
+                            //次にphase4=1にもどったときのためにcount1=0を代入する
                             count1 = 0;
                         }else{
-                        count1++;
+                          //データが5個集まってないときはcount1の変数の数をふやす
+                          count1++;
                         }
                     }         
 
