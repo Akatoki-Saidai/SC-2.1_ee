@@ -5,7 +5,7 @@
 DFRobot_QMC5883 compass;
 TinyGPSPlus gps;
 
-int phase = 5;
+int phase = 1;
 char key = '0';
 const int SAMPLING_RATE = 200;
 int phase_state = 0;
