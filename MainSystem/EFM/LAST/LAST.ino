@@ -785,7 +785,9 @@ void loop() {
                     case 2:{
                       //回転角度の計算（地磁気センサー）
 
+                      Sum_headingDegrees = 0.0;
                       for (i = 0; i < 15; i++){
+
                         Vector norm = compass.readNormalize();
 
                         // Calculate heading
@@ -810,8 +812,6 @@ void loop() {
 
                         // Convert to degrees
                         double headingDegrees = heading * 180/M_PI;
-
-                        headingDegrees = headingDegrees - 180;
 
                         if (headingDegrees < 0){
                           headingDegrees += 360;
@@ -857,25 +857,28 @@ void loop() {
                           llAngle += 360;
                         }
 
-                        if (llAngle > 360){
+                      if (llAngle > 360){
                           llAngle -= 360;
                         }
 
 
                       if (rrAngle > llAngel){
                         //反時計回り
-                        int rotate_time = (int)((llAngle)*1000/rotate_x);
-                        rotating();
-                        delay(rotate_time);
-                        stopping();
+                        if (llAngle > 20){
+                          int rotate_time = (int)((llAngle)*1000/rotate_x);
+                          rotating();
+                          delay(rotate_time);
+                          stopping();
+                        }
 
                       }else{
                         //時計回り
-                        int rotate_time = (int)((rrAngle)*1000/rotate_x);
-                        reverse_rotating();
-                        delay(rotate_time);
-                        stopping();
-
+                        if(rrAngle > 20){
+                          int rotate_time = (int)((rrAngle)*1000/rotate_x);
+                          reverse_rotating();
+                          delay(rotate_time);
+                          stopping();
+                        }
                       }
                       
 
