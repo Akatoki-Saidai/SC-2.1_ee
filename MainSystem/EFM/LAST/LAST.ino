@@ -159,7 +159,7 @@ unsigned long time2;
 
 double Sum_headingDegrees;
 
-double w = 0.4; //地磁気センサーの信頼係数
+double w = 0; //地磁気センサーの信頼係数
 
 double desiredDistance = 2.0; //遠距離フェーズから近距離フェーズに移行する距離
 
@@ -757,6 +757,7 @@ void loop() {
                 }
                 
                 double CurrentDistance = CalculateDis(GOAL_lng, GOAL_lat, gps_longitude, gps_latitude);
+                Serial.print("CurrentDistance=");Serial.println(CurrentDistance);
                 
                 if(desiredDistance >= CurrentDistance){
                   // カラーコーンとの距離が理想値よりも小さい場合は次のフェーズに移行する
@@ -862,7 +863,7 @@ void loop() {
                         }
 
 
-                      if (rrAngle > llAngel){
+                      if (rrAngle > llAngle){
                         //反時計回り
                         if (llAngle > 20){
                           int rotate_time = (int)((llAngle)*1000/rotate_x);
