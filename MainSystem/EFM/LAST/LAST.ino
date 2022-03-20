@@ -840,7 +840,7 @@ void loop() {
                       CanSatLogData.print("Angle_heading");CanSatLogData.println(Angle_heading);                      
                       CanSatLogData.flush();
 
-                      rrAngle = - Angle_heading + Angle_Goal;
+                      double rrAngle = - Angle_heading + Angle_Goal;
 
                       if (rrAngle < 0){
                           rrAngle += 360;
@@ -851,7 +851,7 @@ void loop() {
                         }
 
 
-                      llAngle = Angle_heading - Angle_Goal;
+                      double llAngle = Angle_heading - Angle_Goal;
 
                       if (llAngle < 0){
                           llAngle += 360;
