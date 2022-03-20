@@ -825,7 +825,15 @@ void loop() {
                         // Convert to degrees
                         float headingDegrees = heading * 180/M_PI;
 
-                        headingDegrees = (heading - 180)%360;
+                        headingDegrees = headingDegrees - 180;
+
+                        if (headingDegrees < 0){
+                          headingDegrees += 360;
+                        }
+
+                        if (headingDegrees > 360){
+                          headingDegrees -= 360;
+                        }
 
                         Sum_headingDegrees += headingDegrees;
 
