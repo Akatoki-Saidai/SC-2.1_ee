@@ -86,14 +86,14 @@ double until_5;
 int phase4 = 1;
 //double v_initial= 38.0;  //[m/s]
 double g        = 9.80665;  //[m/s/s]
-double rotate_x = 356;//回転速度(TBD)[deg/s]
+double rotate_x = 57.14;//回転速度(TBD)[deg/s]
 double ditermined_dis = 3; //GPSでどれくらい近づくか(TBD)
 //double angle_radian;
 //double angle_degree;
   
 //you need to set up variables at first
-double GOAL_lat = 35.860714;
-double GOAL_lng = 139.606925;
+double GOAL_lat = 35.859726;
+double GOAL_lng = 139.607175;
 
 //variables___GPS
 //緯度
@@ -835,17 +835,23 @@ void loop() {
 
                       if (360 - Angle_heading + Angle_Goal > Angle_heading - Angle_Goal){
                         //反時計回り
-                        reverse_rotating();
+                        rotating();
                         delay((int)(Angle_heading - Angle_Goal)*1000/rotate_x);
                         stopping();
 
                       }else{
                         //時計回り
-                        rotating();
+                        reverse_rotating();
                         delay((int)(360 - Angle_heading + Angle_Goal)*1000/rotate_x);
                         stopping();
 
                       }
+                      CanSatLogData.println(gps_time);
+                      CanSatLogData.println("Angle_gy270=");CanSatLogData.println(Angle_gy270);    
+                      CanSatLogData.print("Angle_Goal");CanSatLogData.println(Angle_Goal);
+                      CanSatLogData.print("Angle_gps");CanSatLogData.println(Angle_gps);   
+                      CanSatLogData.print("Angle_heading");CanSatLogData.println(Angle_heading);                      
+                      CanSatLogData.flush();
 
                       LongDis_phase = 0;
                       break;
