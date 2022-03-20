@@ -207,8 +207,13 @@ double CalculateAngle(double GOAL_lng, double GOAL_lat, double gps_longitude, do
 
     //目標地点までの角度を導出
     delta_lng = GOAL_lng - gps_longitude;
-    azimuth = rad2deg(atan2(sin(delta_lng),cos(gps_latitude)*tan(GOAL_lat) - sin(gps_latitude)*cos(delta_lng)))%360;
+    azimuth = rad2deg(atan2(sin(delta_lng),cos(gps_latitude)*tan(GOAL_lat) - sin(gps_latitude)*cos(delta_lng)));
 
+    if (azimuth < 0){
+      azimuth += 360;
+    }else if (azimuth > 360){
+      azimuth -= 360;
+    }
     return azimuth;
 }
 
