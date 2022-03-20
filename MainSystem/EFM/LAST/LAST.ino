@@ -159,7 +159,7 @@ unsigned long time2;
 
 double Sum_headingDegrees;
 
-double w = 0.4; //地磁気センサーの信頼係数
+double w = 0; //地磁気センサーの信頼係数
 
 double desiredDistance = 2.0; //遠距離フェーズから近距離フェーズに移行する距離
 
@@ -811,8 +811,6 @@ void loop() {
                         // Convert to degrees
                         double headingDegrees = heading * 180/M_PI;
 
-                        headingDegrees = headingDegrees - 180;
-
                         if (headingDegrees < 0){
                           headingDegrees += 360;
                         }
@@ -862,7 +860,7 @@ void loop() {
                         }
 
 
-                      if (rrAngle > llAngel){
+                      if (rrAngle > llAngle){
                         //反時計回り
                         int rotate_time = (int)((llAngle)*1000/rotate_x);
                         rotating();
