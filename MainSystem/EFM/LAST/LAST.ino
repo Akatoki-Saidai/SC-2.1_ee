@@ -840,16 +840,18 @@ void loop() {
                       CanSatLogData.print("Angle_heading");CanSatLogData.println(Angle_heading);                      
                       CanSatLogData.flush();
 
+                      int rotate_time = (int)((Angle_heading - Angle_Goal)*1000/rotate_x)
+
                       if (360 - Angle_heading + Angle_Goal > Angle_heading - Angle_Goal){
                         //反時計回り
                         rotating();
-                        delay((int)(Angle_heading - Angle_Goal)*1000/rotate_x);
+                        delay(rotate_time);
                         stopping();
 
                       }else{
                         //時計回り
                         reverse_rotating();
-                        delay((int)(360 - Angle_heading + Angle_Goal)*1000/rotate_x);
+                        delay(rotate_time);
                         stopping();
 
                       }
