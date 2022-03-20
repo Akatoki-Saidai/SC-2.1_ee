@@ -870,6 +870,11 @@ void loop() {
                           rotating();
                           delay(rotate_time);
                           stopping();
+                        }else{
+                          accel();
+                          turbo();
+                          delay(2000);
+                          stopping();
                         }
 
                       }else{
@@ -878,6 +883,11 @@ void loop() {
                           int rotate_time = (int)((rrAngle)*1000/rotate_x);
                           reverse_rotating();
                           delay(rotate_time);
+                          stopping();
+                        }else{
+                          accel();
+                          turbo();
+                          delay(2000);
                           stopping();
                         }
                       }
