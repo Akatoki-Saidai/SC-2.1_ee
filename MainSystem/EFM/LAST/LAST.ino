@@ -1,7 +1,10 @@
-//これをかきこむ
 #include <TinyGPS++.h>
 #include <DFRobot_QMC5883.h>
 #include <math.h>
+
+#define rad2deg(a) ((a)/M_PI * 180.0) /* rad を deg に換算するマクロ関数 */
+#define deg2rad(a) ((a)/180.0 * M_PI) /* deg を rad に換算するマクロ関数 */
+
 float aX, aY, aZ, aSqrt, gX, gY, gZ, mDirection, mX, mY, mZ;
 
 DFRobot_QMC5883 compass;
@@ -153,6 +156,35 @@ int i=255;
 unsigned long time1;
 unsigned long time2;
 
+
+double Sum_headingDegrees;
+
+double w = 0.4; //地磁気センサーの信頼係数
+
+double desiredDistance = 2.0; //遠距離フェーズから近距離フェーズに移行する距離
+
+double pre_gps_latitude, pre_gps_longitude;
+int LongDis_phase = 0;
+
+void UpdateMovingAve(double _list){
+  int n = sizeof(_list)/sizeof(double);
+    for(int i=1; i < n; i++){
+        _list[i-1] = _list[i];
+    }
+}
+
+double Average(double _list){
+  int n = sizeof(_list)/sizeof(double);
+  double _sum = _list[0]
+  for (int i = 1; i < n; i++){
+    sum += _list[i];
+  }
+  double _average = _sum / n
+  return _average;
+}
+
+
+
 volatile int timeCounter1;
 hw_timer_t *timer1 = NULL;
 portMUX_TYPE timerMux = portMUX_INITIALIZER_UNLOCKED;
@@ -165,26 +197,37 @@ void IRAM_ATTR onTimer1(){
 }
 
 //緯度経度から距離を返す関数
-float CalculateDis(float GOAL_lng, float gps_longitude, float gps_latitude) {
-    
-   delta_lng=GOAL_lng-gps_longitude;
-   omega = acos(sin(gps_latitude*2*M_PI/360)*sin(GOAL_lat*2*M_PI/360)+cos(gps_latitude*2*M_PI/360)*cos(GOAL_lat*2*M_PI/360)*cos(delta_lng*2*M_PI/360));
-   distance = 6378.137*pow(10,3)*omega;
-     
-  return distance;
+float CalculateDis(float GOAL_lng, float GOAL_lat, float gps_longitude, float gps_latitude) {
+
+    GOAL_lng = deg2rad(GOAL_lng);
+    GOAL_lat = deg2rad(GOAL_lat);
+
+    gps_longitude = deg2rad(gps_longitude);
+    gps_latitude = deg2rad(gps_latitude);
+
+    float EarthRadius = 6378.137; //
+
+    //目標地点までの距離を導出
+    delta_lng = GOAL_lng-gps_longitude;
+
+    distance = EarthRadius * acos(sin(gps_latitude) * sin(GOAL_lat) + cos(gps_latitude) * cos(GOAL_lat) * cos(delta_lng)) * 1000;
+
+    return distance;
 }
 
 //角度計算用の関数
-float CalculateAngle(float GOAL_lng, float gps_longitude, float gps_latitude) {
+float CalculateAngle(float GOAL_lng, float GOAL_lat, float gps_longitude, float gps_latitude) {
+    
+    GOAL_lng = deg2rad(GOAL_lng);
+    GOAL_lat = deg2rad(GOAL_lat);
+
+    gps_longitude = deg2rad(gps_longitude);
+    gps_latitude = deg2rad(gps_latitude);
 
     //目標地点までの角度を導出
-    delta_lng=GOAL_lng-gps_longitude;
-    azimuth=90-(360/(2*M_PI))*atan2((cos((gps_latitude*2*M_PI/360)*2*M_PI/360)*tan((GOAL_lat*2*M_PI/360)*2*M_PI/360)-sin((gps_latitude*2*M_PI/360)*2*M_PI/360)*cos((delta_lng*2*M_PI/360)*2*M_PI/360)),(sin((delta_lng*2*M_PI/360)*2*M_PI/360)));
-    if(azimuth<0)
-    {
-      azimuth += 360;
-    }
-    
+    delta_lng = GOAL_lng - gps_longitude;
+    azimuth = rad2deg(atan2(sin(delta_lng),cos(gps_latitude)*tan(GOAL_lat) - sin(gps_latitude)*cos(delta_lng)))%360;
+
     return azimuth;
 }
 
@@ -266,20 +309,6 @@ void accel(){
 
 //ゆっくり停止
 void stopping(){
-  /*unsigned long currentMillis = millis();
-  if (currentMillis - previousMillis >=50 && i>0){
-    ledcWrite(0,i);
-    ledcWrite(1,0);
-    ledcWrite(2,i);
-    ledcWrite(3,0);
-    i=i-5;
-    Serial.println(i);
-    previousMillis = currentMillis;
-  }
-  else if(i<=0){
-    //Serial.println("hello");
-    stoppage();
-  }*/
     for(int i=60;i>0;i=i-5){
       ledcWrite(0,i);
       ledcWrite(1,0);
@@ -738,253 +767,104 @@ void loop() {
                     CanSatLogData.flush();
 
                     phase_state = 4;
-                    count1 = 0;
-                    count2 = 0;
+
                 }
+                
+                double CurrentDistance = CalculateDis(GOAL_lng, GOAL_lat, gps_longitude, gps_latitude)
+                
+                if(desiredDistance >= CurrentDistance){
+                  // カラーコーンとの距離が理想値よりも小さい場合は次のフェーズに移行する
+                  phase = 5;
 
-                /*switch(Colorsensor_Phase){
-                  case 1:
-                    if (R >= RED, G>= GREEN, B >= BLUE){//ここで色の判定
-                      if (Color_count == 1){
-                        Serial.println("Parachase!!");
-                        back();        //後ろに下がる
-                        delay(2000);   //ここの時間は考える
-                        rotating();    //90度回転
-                        delay(1000);   //ここの時間は考える
-                        forward();     //前に進む
-                        delay(2000);   //ここの時間は考える
-                        Color_count = 2;
-                        Colorsensor_Phase = 2; 
-                        
-                      }
-                      else if(Color_count == 2){
-                        back();        //後ろに下がる
-                        delay(2000);   //ここの時間は考える
-                        rotating();    //180度回転
-                        delay(2000);   //ここの時間は考える
-                        forward();     //前に進む
-                        delay(2000);   //ここの時間は考える
-                        
-                      }
-                    }
-                    else{
-                      Colorsensor_Phase = 3;
-                    }
-                    break;
-                    
-              
-                  case 2:
-                    if (Length <= 50){//ここにはCansatがゴール付近にいるのかどうかを判定
-                      Colorsensor_Phase = 10; //Cansatがゴール付近にいるならば終了
-                    }
-                    else{
-                      Colorsensor_Phase = 1;  //Cansatがゴール付近にいないならばもう一度色の検知から
-                    }
-                    break;
-                    
-                    
-                  case 3:
-                    if (Length <= 50){//ここにはCansatがゴール付近にいるのかどうかを判定
-                      Colorsensor_Phase = 10;
-                    }
-                    else {
-                      Colorsensor_Phase = 1;
-                    }
-                    
-                  
-                  default:
-                  break;
-                }*/
+                }else{
+                  //理想値よりも大きい場合の挙動をここに記述する．
+                  switch(LongDis_phase){
+                    case 0:
+                      //
+                      pre_gps_latitude = gps_latitude;
+                      pre_gps_longitude = gps_longitude;
+                      delay(100) //0.1秒待機
+                      LongDis_phase = 1;
+                      break;
 
-                switch(phase4){  
-                    case 1:
-                    if(counter1 == 0){
-                      Serial.println("phase4 = 1");
-                      counter1++;
+                    case 1:{
+                      //まっすぐ進む
+                      forward();
+                      delay(3000);
+                      stopping();
+                      LongDis_phase = 2;
+                      break;
                     }
-                    delay(1000);    
-                    //データとるために一時停止
-                    stopping();
-                    Serial.println("stopping!");
 
-                    //GPSとGY271で5回の平均を最初に出す
-                    if(count == 0){
-                        Serial.print("heading = ");
-                        Serial.println(heading);
-                        Serial.print("lat = ");
-                        Serial.print(gps_latitude);
-                        Serial.print("   lng = ");
-                        Serial.println(gps_longitude);
-                        
-                        heading_array[count1] = heading;
-                        GPSlat_array[count1] = gps_latitude;
-                        GPSlng_array[count1] = gps_longitude;
-                        if(count1 == 4){
-                            for(count2=0;count2<5;count2++){
-                                heading_sum = heading_sum + heading_array[count2];
-                                GPSlat_sum  = GPSlat_sum  + GPSlat_array[count2];
-                                GPSlng_sum  = GPSlng_sum  + GPSlng_array[count2];
-                                /*
-                                Serial.print(GPSlat_array[count2]);
-                                Serial.print("[");
-                                Serial.print(count);
-                                Serial.println("]");
-                                */
-                            }
-                            heading_data = heading_sum / 5;
-                            GPSlat_data  = GPSlat_sum  / 5;
-                            GPSlng_data   = GPSlat_sum  / 5;
-                            count = 1;
-                            count1 = 0;
-                        }else{
-                          count1++;
-                          Serial.print("count1 = ");
-                          Serial.println(count1);
+                    case 2:{
+                      //回転角度の計算（地磁気センサー）
+
+                      for (i = 0; i < 15; i++){
+                        Vector norm = compass.readNormalize();
+
+                        // Calculate heading
+                        float heading = atan2(norm.YAxis, norm.XAxis);
+
+                        // Set declination angle on your location and fix heading
+                        // You can find your declination on: http://magnetic-declination.com/
+                        // (+) Positive or (-) for negative
+                        // For Bytom / Poland declination angle is 4'26E (positive)
+                        // Formula: (deg + (min / 60.0)) / (180 / M_PI);
+                        float declinationAngle = (-7.0 + (46.0 / 60.0)) / (180 / PI);
+                        heading += declinationAngle;
+
+                        // Correct for heading < 0deg and heading > 360deg
+                        if (heading < 0){
+                          heading += 2 * PI;
                         }
-                        Serial.print("count = ");
-                        Serial.println(count);
-                    }         
 
-                    //5回の平均を既に取得済みなら．(5回まだ取ってない時にこっちのプログラミに行かなくて済む)
-                    else{
-                      Serial.println("phase4_here3!");
-                      //緯度・経度からゴールとの距離を計測
-                      Serial.print("GPSlat_data = ");
-                      Serial.println(GPSlat_data);
-                      Serial.print("GPSlng_data = ");
-                      Serial.println(GPSlng_data);
-                      delta_lng = GOAL_lng - GPSlng_data;
-                      distance = CalculateDis(GOAL_lng,gps_longitude,gps_latitude);
-                      //angle_radian = asin((distance*g)/pow(v_initial,2.0))/2.0;
-                      //angle_degree = angle_radian*360.0/(2.0*M_PI);
-                      CalculateAngle(GOAL_lng,GPSlng_data,GPSlat_data);
-                      Serial.println("HERE2!");
-                      Serial.print("DISTANCE=");
-                      Serial.println(distance);
-                          
-                      // Correct for heading < 0deg and heading > 360deg
-                      if (heading_data < 0){
-                          heading_data += 2 * PI;
-                      }else if (heading_data > 2 * PI){
-                          heading_data -= 2 * PI;
+                        if (heading > 2 * PI){
+                          heading -= 2 * PI;
+                        }
+
+                        // Convert to degrees
+                        float headingDegrees = heading * 180/M_PI;
+
+                        headingDegrees = (heading - 180)%360;
+
+                        Sum_headingDegrees += headingDegrees;
+
+                        delay(100);
                       }
-                      Serial.println("HERE3!");
-                      Serial.print("DISTANCE=");
-                      Serial.println(distance);
-                          
-                      //回転する角度rotate_degreeで
-                      if(headingDegrees > CalculateAngle(GOAL_lng,GPSlng_data,GPSlat_data)){
-                          if(headingDegrees > 180 + CalculateAngle(GOAL_lng,GPSlng_data,GPSlat_data)){ //右回転
-                              rotate_degree = CalculateAngle(GOAL_lng,GPSlng_data,GPSlat_data) - headingDegrees + 360;
-                              rotate_sec = rotate_degree / rotate_x;
-                              rightturn();
-                              Serial.println("turn right");        
-                              delay(rotate_sec);
-                          }else{//左回転
-                              rotate_degree = headingDegrees - CalculateAngle(GOAL_lng,GPSlng_data,GPSlat_data);
-                              rotate_sec = rotate_degree / rotate_x; 
-                              leftturn();
-                              Serial.println("turn left");
-                              delay(rotate_sec);
-                          }
-                      Serial.println("HERE4!");
-                      Serial.print("DISTANCE=");
-                      Serial.println(distance);
-                      }else if(CalculateAngle(GOAL_lng,GPSlng_data,GPSlat_data) >= headingDegrees){
-                          if(CalculateAngle(GOAL_lng,GPSlng_data,GPSlat_data) > 180 + headingDegrees){//左回転
-                              rotate_degree = headingDegrees - CalculateAngle(GOAL_lng,GPSlng_data,GPSlat_data) + 360;
-                              rotate_sec = rotate_degree / rotate_x;
-                              leftturn();
-                              Serial.println("turn left");
-                              delay(rotate_sec);
-                              Serial.println("HERE5!");
-                              Serial.print("DISTANCE=");
-                              Serial.println(distance);
-                      }else{//右回転
-                              rotate_degree = CalculateAngle(GOAL_lng,GPSlng_data,GPSlat_data) - headingDegrees;
-                              rotate_sec = rotate_degree / rotate_x;
-                              rightturn();
-                              Serial.println("turn right");        
-                              delay(rotate_sec);
-                              Serial.println("HERE6!");
-                              Serial.print("DISTANCE=");
-                              Serial.println(distance);
+
+                      Angle_gy270 = Sum_headingDegrees/15;
+                      
+                      double Angle_Goal = CalculateAngle(GOAL_lng, GOAL_lat, gps_longitude, gps_latitude);
+                      double Angle_gps = CalculateAngle(gps_longitude, gps_latitude, pre_gps_longitude,pre_gps_latitude);
+
+                      Angle_heading = w*Angle_gy270 + (1 - w) * Angle_gps;
+
+                      if (360 - Angle_heading + Angle_Goal > Angle_heading - Angle_Goal){
+                        //反時計回り
+                        reverse_rotating();
+                        delay((int)(Angle_heading - Angle_Goal)*1000/rotate_x)
+                        stopping();
+
+                      }else{
+                        //時計回り
+                        rotating();
+                        delay((int)(360 - Angle_heading + Angle_Goal)*1000/rotate_x);
+                        stopping();
+
                       }
+
+                      LongDis_phase = 0;
+                      break;
+                    }
+
                   }
-                  stopping();
-                  Serial.println("stopping!");
-      
-                  forward();
-                  Serial.println("forward!");
-                  Serial.println("HERE7!");
-                  Serial.print("DISTANCE=");
-                  Serial.println(CalculateDis(GOAL_lng,GPSlng_data,GPSlat_data));
-  
-                  //カウンターを変更
-                  phase4 = 2;
-  
-                  //階差を求めたいので，求めたデータは過去のデータに．
-                  Pre_distance = CalculateDis(GOAL_lng,GPSlng_data,GPSlat_data);
-              }break;
+                }
 
-            case 2:
-                Serial.println("phase4 = 2");
-                if(count1 < 4){
-                    GPSlat_array[count1] = gps_latitude;
-                    GPSlng_array[count1] = gps_longitude;
-                    count1++;
-                }else{
-                    phase4 = 3;
-                }
-                Serial.println("HERE8!");
-                Serial.print("DISTANCE=");
-                Serial.println(CalculateDis(GOAL_lng,GPSlng_data,GPSlat_data));
-                break;
-      
-            case 3:
-                Serial.println("phase4 = 3");
-                GPSlat_array[count1] = gps_latitude;
-                GPSlng_array[count1] = gps_longitude;
-                if(count1 < 4){
-                    count1++;
-                }else{
-                    count1 = 0;
-                }
-                Serial.println("HERE9!");
-                Serial.print("DISTANCE=");
-                Serial.println(CalculateDis(GOAL_lng,GPSlng_data,GPSlat_data));
-      
-                //移動平均
-                //一回目はcase1で取った四つのデータと新しい一個のデータを使用．
-                for(count2=0;count2<5;count2++){
-                    GPSlat_sum  = GPSlat_sum  + GPSlat_array[count2];
-                    GPSlng_sum  = GPSlng_sum  + GPSlng_array[count2];
-                    count2++;
-                }
-                GPSlat_data  = GPSlat_sum  / 5;
-                GPSlng_data   = GPSlat_sum  / 5;
-                delta_lng = GOAL_lng - GPSlng_data;
-                distance = CalculateDis(GOAL_lng,gps_longitude,gps_latitude);
-      
-                if(Pre_distance < ditermined_dis){
-                phase = 5;
-                Serial.println("HERE10!");
-                Serial.print("DISTANCE=");
-                Serial.println(CalculateDis(GOAL_lng,GPSlng_data,GPSlat_data));
-                }else if(Pre_distance < CalculateDis(GOAL_lng,GPSlng_data,GPSlat_data) ){
-                    phase4 = 1;
-                    count = 0;
-                    Serial.println("HERE11!");
-                    Serial.print("DISTANCE=");
-                    Serial.println(CalculateDis(GOAL_lng,GPSlng_data,GPSlat_data));
-                }
-                Pre_distance = CalculateDis(GOAL_lng,GPSlng_data,GPSlat_data);
-                break;    
-            }
-           }break;    
-           Serial.println("HERE12!");
-           Serial.print("DISTANCE=");
-           Serial.println(CalculateDis(GOAL_lng,GPSlng_data,GPSlat_data));
+
+
+
+
+                
 
             //########## 近距離探索フェーズ ##########
             case 5:
