@@ -5,7 +5,7 @@
 #define rad2deg(a) ((a)/M_PI * 180.0) /* rad を deg に換算するマクロ関数 */
 #define deg2rad(a) ((a)/180.0 * M_PI) /* deg を rad に換算するマクロ関数 */
 
-float aX, aY, aZ, aSqrt, gX, gY, gZ, mDirection, mX, mY, mZ;
+double aX, aY, aZ, aSqrt, gX, gY, gZ, mDirection, mX, mY, mZ;
 
 DFRobot_QMC5883 compass;
 TinyGPSPlus gps;
@@ -21,14 +21,14 @@ int yeah = 1;
 int type_state = 0;
 int cutparac = 23;                  //切り離し用トランジスタのピン番号の宣言
 int outputcutsecond = 5;            //切り離し時の9V電圧を流す時間，単位はsecond
-float time3_1,time3_2,St_Time;      //時間に関するもの
-float Accel[6];                     //計測した値をおいておく関数
-float Altitude[6];                  //(高度)
-float Preac,differ1,Acsum,Acave,RealDiffer1;
-float Preal,differ2,Alsum,Alave,RealDiffer2;
+double time3_1,time3_2,St_Time;      //時間に関するもの
+double Accel[6];                     //計測した値をおいておく関数
+double Altitude[6];                  //(高度)
+double Preac,differ1,Acsum,Acave,RealDiffer1;
+double Preal,differ2,Alsum,Alave,RealDiffer2;
 int i_3=0;
 int j_3=0;
-float RealDiffer;
+double RealDiffer;
 
 //for MPU6050
 #include <MPU9250_asukiaaa.h>
@@ -81,44 +81,44 @@ double current_altitude;
 int count = 0;
 //int   count1 = 0;
 //int   count2 = 0;
-float until_5;
+double until_5;
 
 int phase4 = 1;
-//float v_initial= 38.0;  //[m/s]
-float g        = 9.80665;  //[m/s/s]
-float rotate_x = 356;//回転速度(TBD)[deg/s]
-float ditermined_dis = 3; //GPSでどれくらい近づくか(TBD)
-//float angle_radian;
-//float angle_degree;
+//double v_initial= 38.0;  //[m/s]
+double g        = 9.80665;  //[m/s/s]
+double rotate_x = 356;//回転速度(TBD)[deg/s]
+double ditermined_dis = 3; //GPSでどれくらい近づくか(TBD)
+//double angle_radian;
+//double angle_degree;
   
 //you need to set up variables at first
-float GOAL_lat = 35.860714;
-float GOAL_lng = 139.606925;
+double GOAL_lat = 35.860714;
+double GOAL_lng = 139.606925;
 
 //variables___GPS
 //緯度
-float GPSlat_array[5];
-float GPSlat_sum = 0;
-float GPSlat_data;
+double GPSlat_array[5];
+double GPSlat_sum = 0;
+double GPSlat_data;
 //経度
-float GPSlng_array[5];
-float GPSlng_sum = 0;
-float GPSlng_data;
-float delta_lng;
+double GPSlng_array[5];
+double GPSlng_sum = 0;
+double GPSlng_data;
+double delta_lng;
 //距離
-float distance; //直進前後でゴールに近づいているかどうかを表す
-float Pre_distance;
+double distance; //直進前後でゴールに近づいているかどうかを表す
+double Pre_distance;
 //variables___GY-271
-float heading_data;
-float heading_array[5];
-float heading_sum = 0;
-float heading;
-float rotate_degree = 0;
-float rotate_sec = 0;
+double heading_data;
+double heading_array[5];
+double heading_sum = 0;
+double heading;
+double rotate_degree = 0;
+double rotate_sec = 0;
 //Vector norm = compass.readNormalize();
-float headingDegrees;
-float omega;
-float azimuth;
+double headingDegrees;
+double omega;
+double azimuth;
 
 //GPSのデータがちゃんと得られてるかどうか一回だけ表示するための変数
 int counter  = 0;
@@ -166,25 +166,6 @@ double desiredDistance = 2.0; //遠距離フェーズから近距離フェーズ
 double pre_gps_latitude, pre_gps_longitude;
 int LongDis_phase = 0;
 
-void UpdateMovingAve(double _list){
-  int n = sizeof(_list)/sizeof(double);
-    for(int i=1; i < n; i++){
-        _list[i-1] = _list[i];
-    }
-}
-
-double Average(double _list){
-  int n = sizeof(_list)/sizeof(double);
-  double _sum = _list[0]
-  for (int i = 1; i < n; i++){
-    sum += _list[i];
-  }
-  double _average = _sum / n
-  return _average;
-}
-
-
-
 volatile int timeCounter1;
 hw_timer_t *timer1 = NULL;
 portMUX_TYPE timerMux = portMUX_INITIALIZER_UNLOCKED;
@@ -197,7 +178,7 @@ void IRAM_ATTR onTimer1(){
 }
 
 //緯度経度から距離を返す関数
-float CalculateDis(float GOAL_lng, float GOAL_lat, float gps_longitude, float gps_latitude) {
+double CalculateDis(double GOAL_lng, double GOAL_lat, double gps_longitude, double gps_latitude) {
 
     GOAL_lng = deg2rad(GOAL_lng);
     GOAL_lat = deg2rad(GOAL_lat);
@@ -205,7 +186,7 @@ float CalculateDis(float GOAL_lng, float GOAL_lat, float gps_longitude, float gp
     gps_longitude = deg2rad(gps_longitude);
     gps_latitude = deg2rad(gps_latitude);
 
-    float EarthRadius = 6378.137; //
+    double EarthRadius = 6378.137; //
 
     //目標地点までの距離を導出
     delta_lng = GOAL_lng-gps_longitude;
@@ -216,7 +197,7 @@ float CalculateDis(float GOAL_lng, float GOAL_lat, float gps_longitude, float gp
 }
 
 //角度計算用の関数
-float CalculateAngle(float GOAL_lng, float GOAL_lat, float gps_longitude, float gps_latitude) {
+double CalculateAngle(double GOAL_lng, double GOAL_lat, double gps_longitude, double gps_latitude) {
     
     GOAL_lng = deg2rad(GOAL_lng);
     GOAL_lat = deg2rad(GOAL_lat);
@@ -476,14 +457,14 @@ void loop() {
         //GY271
         Vector norm = compass.readNormalize();
         //CanSatの北からの角度を計算
-        float heading = atan2(norm.YAxis, norm.XAxis);
+        double heading = atan2(norm.YAxis, norm.XAxis);
       
         // Set declination angle on your location and fix heading
         // You can find your declination on: http://magnetic-declination.com/
         // (+) Positive or (-) for negative
         // For Bytom / Poland declination angle is 4'26E (positive)
         // Formula: (deg + (min / 60.0)) / (180 / M_PI);
-        float declinationAngle = (4.0 + (26.0 / 60.0)) / (180 / PI);
+        double declinationAngle = (4.0 + (26.0 / 60.0)) / (180 / PI);
         heading += declinationAngle;
       
         // Correct for heading < 0deg and heading > 360deg
@@ -496,7 +477,7 @@ void loop() {
         }
       
         //radからdegに変換
-        float headingDegrees = heading * 180/M_PI; 
+        double headingDegrees = heading * 180/M_PI; 
         
         //BMP180
         Temperature = bmp.readTemperature();
@@ -803,14 +784,14 @@ void loop() {
                         Vector norm = compass.readNormalize();
 
                         // Calculate heading
-                        float heading = atan2(norm.YAxis, norm.XAxis);
+                        double heading = atan2(norm.YAxis, norm.XAxis);
 
                         // Set declination angle on your location and fix heading
                         // You can find your declination on: http://magnetic-declination.com/
                         // (+) Positive or (-) for negative
                         // For Bytom / Poland declination angle is 4'26E (positive)
                         // Formula: (deg + (min / 60.0)) / (180 / M_PI);
-                        float declinationAngle = (-7.0 + (46.0 / 60.0)) / (180 / PI);
+                        double declinationAngle = (-7.0 + (46.0 / 60.0)) / (180 / PI);
                         heading += declinationAngle;
 
                         // Correct for heading < 0deg and heading > 360deg
@@ -823,7 +804,7 @@ void loop() {
                         }
 
                         // Convert to degrees
-                        float headingDegrees = heading * 180/M_PI;
+                        double headingDegrees = heading * 180/M_PI;
 
                         headingDegrees = headingDegrees - 180;
 
