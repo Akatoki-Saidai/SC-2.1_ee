@@ -10,7 +10,7 @@ double aX, aY, aZ, aSqrt, gX, gY, gZ, mDirection, mX, mY, mZ;
 DFRobot_QMC5883 compass;
 TinyGPSPlus gps;
 
-int phase = 5;
+int phase = 4;
 char key = '0';
 const int SAMPLING_RATE = 200;
 int phase_state = 0;
@@ -756,7 +756,7 @@ void loop() {
 
                 }
                 
-                double CurrentDistance = CalculateDis(GOAL_lng, GOAL_lat, gps_longitude, gps_latitude)
+                double CurrentDistance = CalculateDis(GOAL_lng, GOAL_lat, gps_longitude, gps_latitude);
                 
                 if(desiredDistance >= CurrentDistance){
                   // カラーコーンとの距離が理想値よりも小さい場合は次のフェーズに移行する
@@ -769,7 +769,7 @@ void loop() {
                       //
                       pre_gps_latitude = gps_latitude;
                       pre_gps_longitude = gps_longitude;
-                      delay(100) //0.1秒待機
+                      delay(100); //0.1秒待機
                       LongDis_phase = 1;
                       break;
 
@@ -826,17 +826,17 @@ void loop() {
                         delay(100);
                       }
 
-                      Angle_gy270 = Sum_headingDegrees/15;
+                      double Angle_gy270 = Sum_headingDegrees/15;
                       
                       double Angle_Goal = CalculateAngle(GOAL_lng, GOAL_lat, gps_longitude, gps_latitude);
                       double Angle_gps = CalculateAngle(gps_longitude, gps_latitude, pre_gps_longitude,pre_gps_latitude);
 
-                      Angle_heading = w*Angle_gy270 + (1 - w) * Angle_gps;
+                      double Angle_heading = w*Angle_gy270 + (1 - w) * Angle_gps;
 
                       if (360 - Angle_heading + Angle_Goal > Angle_heading - Angle_Goal){
                         //反時計回り
                         reverse_rotating();
-                        delay((int)(Angle_heading - Angle_Goal)*1000/rotate_x)
+                        delay((int)(Angle_heading - Angle_Goal)*1000/rotate_x);
                         stopping();
 
                       }else{
@@ -854,7 +854,7 @@ void loop() {
                   }
                 }
 
-
+               break;}
 
 
 
