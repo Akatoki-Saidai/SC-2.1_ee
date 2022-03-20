@@ -86,14 +86,14 @@ double until_5;
 int phase4 = 1;
 //double v_initial= 38.0;  //[m/s]
 double g        = 9.80665;  //[m/s/s]
-double rotate_x = 57.14;//回転速度(TBD)[deg/s]
+double rotate_x = 308;//回転速度(TBD)[deg/s]
 double ditermined_dis = 3; //GPSでどれくらい近づくか(TBD)
 //double angle_radian;
 //double angle_degree;
   
 //you need to set up variables at first
-double GOAL_lat = 35.859726;
-double GOAL_lng = 139.607175;
+double GOAL_lat = 35.859889;
+double GOAL_lng = 139.607189;
 
 //variables___GPS
 //緯度
@@ -268,16 +268,16 @@ void rightturn(){
 
 //回転
 void rotating(){
-  ledcWrite(0, 50);
+  ledcWrite(0, 100);
   ledcWrite(1, 0);
   ledcWrite(2, 0);
-  ledcWrite(3, 50);
+  ledcWrite(3, 100);
 }
 //反回転
 void reverse_rotating(){
   ledcWrite(0, 0);
-  ledcWrite(1, 63);
-  ledcWrite(2, 63);
+  ledcWrite(1, 120);
+  ledcWrite(2, 120);
   ledcWrite(3, 0);  
 }
 
@@ -777,7 +777,7 @@ void loop() {
                     case 1:{
                       //まっすぐ進む
                       forward();
-                      delay(3000);
+                      delay(4000);
                       stopping();
                       LongDis_phase = 2;
                       break;
