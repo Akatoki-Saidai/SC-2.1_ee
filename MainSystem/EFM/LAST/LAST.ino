@@ -833,6 +833,13 @@ void loop() {
 
                       double Angle_heading = w*Angle_gy270 + (1 - w) * Angle_gps;
 
+                      CanSatLogData.println(gps_time);
+                      CanSatLogData.println("Angle_gy270=");CanSatLogData.println(Angle_gy270);    
+                      CanSatLogData.print("Angle_Goal");CanSatLogData.println(Angle_Goal);
+                      CanSatLogData.print("Angle_gps");CanSatLogData.println(Angle_gps);   
+                      CanSatLogData.print("Angle_heading");CanSatLogData.println(Angle_heading);                      
+                      CanSatLogData.flush();
+
                       if (360 - Angle_heading + Angle_Goal > Angle_heading - Angle_Goal){
                         //反時計回り
                         rotating();
@@ -846,12 +853,7 @@ void loop() {
                         stopping();
 
                       }
-                      CanSatLogData.println(gps_time);
-                      CanSatLogData.println("Angle_gy270=");CanSatLogData.println(Angle_gy270);    
-                      CanSatLogData.print("Angle_Goal");CanSatLogData.println(Angle_Goal);
-                      CanSatLogData.print("Angle_gps");CanSatLogData.println(Angle_gps);   
-                      CanSatLogData.print("Angle_heading");CanSatLogData.println(Angle_heading);                      
-                      CanSatLogData.flush();
+                      
 
                       LongDis_phase = 0;
                       break;
