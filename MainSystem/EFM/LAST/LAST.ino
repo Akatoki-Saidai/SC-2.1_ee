@@ -10,7 +10,7 @@ double aX, aY, aZ, aSqrt, gX, gY, gZ, mDirection, mX, mY, mZ;
 DFRobot_QMC5883 compass;
 TinyGPSPlus gps;
 
-int phase = 4;
+int phase = 5;
 char key = '0';
 const int SAMPLING_RATE = 200;
 int phase_state = 0;
@@ -268,10 +268,10 @@ void rightturn(){
 
 //回転
 void rotating(){
-  ledcWrite(0, 100);
+  ledcWrite(0, 50);
   ledcWrite(1, 0);
   ledcWrite(2, 0);
-  ledcWrite(3, 100);
+  ledcWrite(3, 50);
 }
 //反回転
 void reverse_rotating(){
@@ -931,11 +931,21 @@ void loop() {
                   case 5:
                     Serial.print("phase(rotating)=");
                     Serial.println(phase_5);
+                    CanSatLogData.println("-----------------------");
+                    CanSatLogData.println("ROTATING PHASE");
+                    CanSatLogData.print("GPS TIME:");CanSatLogData.println(gps_time);
+                    CanSatLogData.println("searching for the goal...");
+                    CanSatLogData.flush();
                     rotating();
                     if(ultra_distance < 300 && ultra_distance != 0){
                       phase_5 = 0;
                       stoppage();
                       Serial.println("STOP!");
+                      CanSatLogData.println("-----------------------");
+                      CanSatLogData.println("STOPPAGE PHASE");
+                      CanSatLogData.print("GPS TIME:");CanSatLogData.println(gps_time);
+                      CanSatLogData.println("goal is detected!");
+                      CanSatLogData.flush();
                     }
                     break;
                     
@@ -959,6 +969,11 @@ void loop() {
                   case 1:
                     Serial.print("phase(forward)=");
                     Serial.println(phase_5);
+                    CanSatLogData.println("-----------------------");
+                    CanSatLogData.println("FORWARD PHASE");
+                    CanSatLogData.print("GPS TIME:");CanSatLogData.println(gps_time);
+                    CanSatLogData.println("moving for 1000[ms]"); 
+                    CanSatLogData.flush();
                     time2 = millis();
                     forward();
                     if(time2 - time1 >= 1000){
@@ -984,15 +999,25 @@ void loop() {
                   case 3:
                     Serial.print("phase(judge)=");
                     Serial.println(phase_5);
+                    CanSatLogData.println("-----------------------");
+                    CanSatLogData.println("JUDGEING PHASE");
+                    CanSatLogData.print("GPS TIME:");CanSatLogData.println(gps_time);
+                    CanSatLogData.flush();
                     if(distance2-distance1<0){
                       if(distance2<100){
                       phase_5 = 4;
+                      CanSatLogData.println("goal!"); 
+                      CanSatLogData.flush();
                       }
                       else{
                       phase_5 = 1;
+                      CanSatLogData.println("approaching!"); 
+                      CanSatLogData.flush();
                       }
                     }else{
                       phase_5 = 5;
+                      CanSatLogData.println("receding...");
+                      CanSatLogData.flush();
                     }
                     break;
               
@@ -1000,8 +1025,10 @@ void loop() {
                     Serial.print("phase(goal)=");
                     Serial.println(phase_5);
                     Serial.println("GOAL!");
-                    CanSatLogData.println("GOAL!");  
-                    CanSatLogData.flush();
+                    CanSatLogData.println("-----------------------");
+                    CanSatLogData.println("STOPPING PHASE");
+                    CanSatLogData.print("GPS TIME:");CanSatLogData.println(gps_time);
+                    CanSatLogData.println("conglatulations!");
                     phase_5 = 6;
                     break;
                     
