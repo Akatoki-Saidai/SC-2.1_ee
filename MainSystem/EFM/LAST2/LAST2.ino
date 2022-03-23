@@ -83,8 +83,7 @@ double until_5;
 
 int phase4 = 1;
 double g        = 9.80665;  //[m/s/s]
-double rotate_tokei = 308;//回転速度(TBD)[deg/s]
-double rotate_hantokei = 308;
+double rotate_hantokei = 308; //回転速度(TBD)[deg/s]
 double ditermined_dis = 3; //GPSでどれくらい近づくか(TBD)
   
 //you need to set up variables at first
@@ -690,7 +689,7 @@ void loop() {
                       CanSatLogData.println("-----------------------");
                       CanSatLogData.println("FORWARD PHASE");
                       CanSatLogData.print("GPS TIME:");CanSatLogData.println(gps_time);
-                      CanSatLogData.println("moving for 4[s] to calculate rrAngle and llAngle");
+                      CanSatLogData.println("moving for 4[s] to calculate llAngle");
                       CanSatLogData.flush();
                       forward();
                       delay(4000);
@@ -705,17 +704,6 @@ void loop() {
                       double Angle_gps = CalculateAngle(gps_longitude, gps_latitude, pre_gps_longitude,pre_gps_latitude);
                       double Angle_heading = Angle_gps;                
 
-                      double rrAngle = - Angle_heading + Angle_Goal;
-
-                      if (rrAngle < 0){
-                          rrAngle += 360;
-                        }
-
-                        if (rrAngle > 360){
-                          rrAngle -= 360;
-                        }
-
-
                       double llAngle = Angle_heading - Angle_Goal;
 
                       if (llAngle < 0){
@@ -729,11 +717,9 @@ void loop() {
                       CanSatLogData.println("-----------------------");
                       CanSatLogData.println("ROTATING PHASE");
                       CanSatLogData.print("GPS TIME:");CanSatLogData.println(gps_time);
-                      CanSatLogData.print("rrAngle:");CanSatLogData.println(rrAngle);
                       CanSatLogData.print("llAngle:");CanSatLogData.println(llAngle);
                       CanSatLogData.flush();
 
-                      if (rrAngle > llAngle){
                         //反時計回り
                         if (llAngle > 20){
                           int rotate_time = (int)((llAngle)*1000/rotate_hantokei);
@@ -750,27 +736,7 @@ void loop() {
                           delay(2000);
                           stopping();
                         }
-
-                      }else{
-                        //時計回り
-                        if(rrAngle > 20){
-                          int rotate_time = (int)((rrAngle)*1000/rotate_tokei);
-                          CanSatLogData.print("rotating right for ");CanSatLogData.print(rotate_time);CanSatLogData.println("[ms]");
-                          CanSatLogData.flush();
-                          reverse_rotating();
-                          delay(rotate_time);
-                          stoppage();
-                        }else{
-                          CanSatLogData.println("moving for 2[s]");
-                          CanSatLogData.flush();
-                          accel();
-                          turbo();
-                          delay(2000);
-                          stopping();
-                        }
-                      }
                       
-
                       LongDis_phase = 0;
                       break;
                     }
