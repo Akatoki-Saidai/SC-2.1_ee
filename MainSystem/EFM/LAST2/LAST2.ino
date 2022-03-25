@@ -17,8 +17,8 @@ int phase_state = 0;
 int type = 1;
 int yeah = 1;
 int type_state = 0;
-int cutparac = 23;                  //切り離し用トランジスタのピン番号の宣言
-int outputcutsecond = 5;            //切り離し時の9V電圧を流す時間，単位はsecond
+int cutparac = 19;                  //切り離し用トランジスタのピン番号の宣言
+int outputcutsecond = 30;            //切り離し時の9V電圧を流す時間，単位はsecond
 double time3_1,time3_2,St_Time;      //時間に関するもの
 double Accel[6];                     //計測した値をおいておく関数
 double Altitude[6];                  //(高度)
@@ -83,7 +83,7 @@ double until_5;
 
 int phase4 = 1;
 double g        = 9.80665;  //[m/s/s]
-double rotate_hantokei = 308; //回転速度(TBD)[deg/s]
+double rotate_hantokei = 514; //回転速度(TBD)[deg/s]
 double ditermined_dis = 3; //GPSでどれくらい近づくか(TBD)
   
 //you need to set up variables at first
@@ -211,7 +211,7 @@ double CalculateAngle(double GOAL_lng, double GOAL_lat, double gps_longitude, do
 
 //前進
 void forward(){
-  ledcWrite(0, 127); //channel, duty
+  ledcWrite(0, 97); //channel, duty
   ledcWrite(1, 0);
   ledcWrite(2, 127);
   ledcWrite(3, 0);
@@ -219,7 +219,7 @@ void forward(){
 
 //ターボ
 void turbo(){
-  ledcWrite(0, 255); //channel, duty
+  ledcWrite(0, 225); //channel, duty
   ledcWrite(1, 0);
   ledcWrite(2, 255);
   ledcWrite(3, 0);
@@ -260,16 +260,16 @@ void rightturn(){
 
 //回転
 void rotating(){
-  ledcWrite(0, 50);
+  ledcWrite(0, 100);
   ledcWrite(1, 0);
   ledcWrite(2, 0);
-  ledcWrite(3, 50);
+  ledcWrite(3, 100);
 }
 //反回転
 void reverse_rotating(){
   ledcWrite(0, 0);
-  ledcWrite(1, 120);
-  ledcWrite(2, 120);
+  ledcWrite(1, 100);
+  ledcWrite(2, 100);
   ledcWrite(3, 0);  
 }
 
@@ -407,6 +407,9 @@ void setup() {
       Wire.write(0x42);
       Wire.write(0x12);
       Wire.endTransmission();
+      
+    //ピン設定
+      pinMode(cutparac,OUTPUT);
 
 }//setup関数閉じ
 
@@ -470,6 +473,37 @@ void loop() {
                     break;
             case 4: break; }
         }
+
+        Serial.print(gps_time);
+        Serial.print(",");        
+        Serial.print(gps_latitude,9);
+        Serial.print(",");
+        Serial.print(gps_longitude,9);
+        Serial.print(",");
+        Serial.print(gps_velocity);
+        Serial.print(",");
+        Serial.print(Temperature);
+        Serial.print(",");
+        Serial.print(Pressure);
+        Serial.print(",");
+        Serial.print(accelX);
+        Serial.print(",");
+        Serial.print(accelY);
+        Serial.print(",");
+        Serial.print(accelZ);
+        Serial.print(",");
+        Serial.print(heading);
+        Serial.print(",");
+        Serial.print(headingDegrees);
+        Serial.print(",");
+        Serial.print(R);
+        Serial.print(",");
+        Serial.print(G);
+        Serial.print(",");
+        Serial.print(B);
+        Serial.print(",");
+        Serial.println(ultra_distance);      
+        Serial.flush();
 
         //各フェーズごとの記述
         switch (phase){
@@ -563,7 +597,6 @@ void loop() {
                     phase_state = 2;
                 }
 
-
                 if(yeah == 1){     //データを初めから五個得るまで
                     Accel[i_3] = accelSqrt;
                     Altitude[i_3] = altitude;
@@ -626,7 +659,7 @@ void loop() {
                     CanSatLogData.flush();
                     phase_state = 3;
                     time3_1 = currentMillis;                           //phase3　開始時間の保存
-                    St_Time = time3_1 + outputcutsecond * 1000;        //基準時間
+                    St_Time = time3_1 + outputcutsecond * 1000; //基準時間
                     Serial.write("WARNING: The cut-para code has been entered.\n");
                     digitalWrite(cutparac, HIGH); //オン
                     Serial.write("WARNING: 9v voltage is output.\n");
