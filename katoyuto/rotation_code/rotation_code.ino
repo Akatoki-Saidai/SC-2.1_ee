@@ -1,6 +1,6 @@
-int Angular_velocity = 100; //[deg/sec]
-int Angle_of_rotation = 60; //[deg]
-int Time_of_rotation;
+double Angular_velocity = 100; //[deg/sec]
+double Angle_of_rotation = 60; //[deg]
+double Time_of_rotation;
 int Time;
 int previousMillis;
 int currentMillis;
@@ -8,14 +8,22 @@ int i;
 
 
 void setup() {
-  Serial.begin(119200);
+  Serial.begin(115200);
+      ledcSetup(0, 490, 8);
+      ledcSetup(1, 490, 8);
+      ledcSetup(2, 490, 8);
+      ledcSetup(3, 490, 8);
+    
+      ledcAttachPin(32, 0);
+      ledcAttachPin(33, 1);
+      ledcAttachPin(26, 2);
+      ledcAttachPin(25, 3);
   
 }
 
 void loop() {
   
-  
-  
+  rotating();  
   
 }
 
@@ -84,18 +92,19 @@ void stopping(){
   else if(i<=0){
     Serial.println("hello");
     stoppage();
+  }
 }
-}
+
 
 //回転
 void rotating(){
   Time_of_rotation = Angle_of_rotation / Angular_velocity;
-  Serial.print(Time_of_rotation);
+  Serial.print(Time_of_rotation*1000);Serial.println("[ms]");
   ledcWrite(0, 30);
   ledcWrite(1, 0);
   ledcWrite(2, 0);
   ledcWrite(3, 30);
-  delay(Time_of_rotation);
+  delay(Time_of_rotation*1000);
 }
 //反回転
 void reverse_rotating(){
