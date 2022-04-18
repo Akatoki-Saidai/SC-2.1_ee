@@ -16,18 +16,19 @@
 
 DFRobot_QMC5883 compass;
 int phase4 = 1;
-float minX = 0;
-float maxX = 0;
-float minY = 0;
-float maxY = 0;
-float minZ = 0;
-float maxZ = 0;
-float offsetX = 0;
-float offsetY = 0;
-float offsetZ = 0;
+float minX;
+float maxX;
+float minY;
+float maxY;
+float minZ;
+float maxZ;
+float offsetX;
+float offsetY;
+float offsetZ;
 float mag_X;
 float mag_Y;
 float mag_Z;
+double theta;
 unsigned long current_Millis;
 unsigned long previous_Millis;
 unsigned long decided_Millis;
@@ -54,7 +55,7 @@ void setup() {
     compass.setSamples(QMC5883_SAMPLES_8);
   }
   delay(1000);
-  unsigned long decided_Millis = millis()+5000;
+  decided_Millis = millis()+10000;
   Serial.println(millis());
   Serial.println(decided_Millis);
 }
@@ -63,38 +64,74 @@ void loop() {
   Vector mag = compass.readRaw();
   switch(phase4){
     case 1:
+    {
+      maxX = mag.XAxis;
+      maxY = mag.YAxis;
+      maxZ = mag.ZAxis;
+      minX = mag.XAxis;
+      minY = mag.YAxis;
+      minZ = mag.ZAxis;
+      phase4 = 2;
+    }
+
+    case 2:
+    {
     //rotating();
-    if(mag.XAxis > maxX)  {
-      maxX = mag.XAxis};
-    if(mag.YAxis > maxY)  {
-      maxY = mag.YAxis};
-    if(mag.ZAxis > maxZ)  {
-      maxZ = mag.ZAxis};
-  
-    if(mag.XAxis < minX)  {
-      minX = mag.XAxis};
-    if(mag.YAxis > minY)  {
-      minY = mag.YAxis};
-    if(mag.ZAxis > minZ)  {
-      minZ = mag.ZAxis};
-    
+    if(mag.XAxis > maxX) maxX = mag.XAxis;
+    if(mag.YAxis > maxY) maxY = mag.YAxis;
+    if(mag.ZAxis > maxZ) maxZ = mag.ZAxis;
+
+    if(mag.XAxis < minX) minX = mag.XAxis;
+    if(mag.YAxis < minY) minY = mag.YAxis;
+    if(mag.ZAxis < minZ) minZ = mag.ZAxis;
+
     current_Millis = millis();
-    Serial.println(current_Millis);
+    //Serial.println(current_Millis);
     if (current_Millis > decided_Millis){
       Serial.println(current_Millis);
-      phase4 = 2;
+      Serial.println(decided_Millis);
+      phase4 = 3;
       //stopping();
-      offsetX = maxX + minX;
-      offsetY = maxY + minY;
-      offsetZ = maxZ + minZ;
-    }else{
-      Serial.println("here");
+      offsetX = (maxX + minX)/2;
+      offsetY = (maxY + minY)/2;
+      offsetZ = (maxZ + minZ)/2;
+      Serial.print("max=  ");
+      Serial.print(maxX);
+      Serial.print(",");
+      Serial.print(maxY);
+      Serial.print(",");
+      Serial.println(maxZ);
+
+      Serial.print("min=  ");
+      Serial.print(minX);
+      Serial.print(",");
+      Serial.print(minY);
+      Serial.print(",");
+      Serial.println(minZ);
+      
+      Serial.print("off=  ");
+      Serial.print(offsetX);
+      Serial.print(",");
+      Serial.print(offsetY);
+      Serial.print(",");
+      Serial.println(offsetZ);
     }
     break;
-  
-    case 2:
+    }
+    case 3:
+    {
     current_Millis = millis();
-    Serial.println(current_Millis);
+    //Serial.println(current_Millis);
+    /*
+    mag_X = mag.XAxis;
+    mag_Y = mag.YAxis;
+    mag_Z = mag.ZAxis;
+    Serial.print(mag_X);
+    Serial.print(",");
+    Serial.print(mag_Y);
+    Serial.print(",");
+    Serial.println(mag_Z);
+    */
     mag_X = mag.XAxis - offsetX;
     mag_Y = mag.YAxis - offsetY;
     mag_Z = mag.ZAxis - offsetZ;
@@ -103,6 +140,13 @@ void loop() {
     Serial.print(mag_Y);
     Serial.print(",");
     Serial.println(mag_Z);
+    
+    //theta = atan2(mag_Y,mag_X);
+    //Serial.println(theta);
+    
+
+    //delay(10000);
     break;
-}
+    }
+  }
 }
