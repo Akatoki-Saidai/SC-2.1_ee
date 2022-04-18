@@ -1,5 +1,5 @@
-double Angular_velocity = 100; //[deg/sec]
-double Angle_of_rotation = 60; //[deg]
+double Angular_velocity = 253; //[deg/sec]
+double Angle_of_rotation = 90; //[deg]
 double Time_of_rotation;
 int Time;
 int previousMillis;
@@ -23,15 +23,18 @@ void setup() {
 
 void loop() {
   
-  rotating();  
+  rotating1();
+  delay(5000);
+  stoppage();
+  delay(1000);
   
 }
 
 //前進
-void forward(){
-  ledcWrite(0, 127); //channel, duty
-  ledcWrite(1, 0);
-  ledcWrite(2, 127);
+void rotating1(){
+  ledcWrite(0, 0); //channel, duty
+  ledcWrite(1, 30);
+  ledcWrite(2, 60);
   ledcWrite(3, 0);
 }
 
@@ -104,7 +107,7 @@ void rotating(){
   ledcWrite(1, 0);
   ledcWrite(2, 0);
   ledcWrite(3, 30);
-  delay(Time_of_rotation*1000);
+  delay(Time_of_rotation*1000*1.5);
 }
 //反回転
 void reverse_rotating(){
