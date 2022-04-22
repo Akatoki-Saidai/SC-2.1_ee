@@ -1,6 +1,6 @@
 /*!
- * @file QMC5883_readRaw.cpp
- * @brief show raw data
+ * @file QMC5883_compass.cpp
+ * @brief The program shows how to realize the function compass.When the program runs, please spin QMC5883 freely to accomplish calibration.
  * @n 3-Axis Digital Compass IC
  *
  * @copyright  [DFRobot](http://www.dfrobot.com), 2017
@@ -15,138 +15,94 @@
 #include <DFRobot_QMC5883.h>
 
 DFRobot_QMC5883 compass;
-int phase4 = 1;
-float minX;
-float maxX;
-float minY;
-float maxY;
-float minZ;
-float maxZ;
-float offsetX;
-float offsetY;
-float offsetZ;
-float mag_X;
-float mag_Y;
-float mag_Z;
-double theta;
-unsigned long current_Millis;
-unsigned long previous_Millis;
-unsigned long decided_Millis;
 
-void setup() {
+int CalibrationCounter = 1;
+int calibration = 1;
+void setup()
+{
   Serial.begin(115200);
-
-  // Initialize Initialize QMC5883
-  while (!compass.begin()){
+  while (!compass.begin())
+  {
     Serial.println("Could not find a valid QMC5883 sensor, check wiring!");
     delay(500);
   }
-  if(compass.isHMC() ){
-    Serial.println("Initialize HMC5883");
-    compass.setRange(HMC5883L_RANGE_1_3GA);
-    compass.setMeasurementMode(HMC5883L_CONTINOUS);
-    compass.setDataRate(HMC5883L_DATARATE_15HZ);
-    compass.setSamples(HMC5883L_SAMPLES_8);
-  }else if(compass.isQMC()){
-    Serial.println("Initialize QMC5883");
-    compass.setRange(QMC5883_RANGE_2GA);
-    compass.setMeasurementMode(QMC5883_CONTINOUS); 
-    compass.setDataRate(QMC5883_DATARATE_50HZ);
-    compass.setSamples(QMC5883_SAMPLES_8);
+
+    if(compass.isHMC()){
+        Serial.println("Initialize HMC5883");
+        compass.setRange(HMC5883L_RANGE_1_3GA);
+        compass.setMeasurementMode(HMC5883L_CONTINOUS);
+        compass.setDataRate(HMC5883L_DATARATE_15HZ);
+        compass.setSamples(HMC5883L_SAMPLES_8);
+    }
+   else if(compass.isQMC()){
+        Serial.println("Initialize QMC5883");
+        compass.setRange(QMC5883_RANGE_2GA);
+        compass.setMeasurementMode(QMC5883_CONTINOUS); 
+        compass.setDataRate(QMC5883_DATARATE_50HZ);
+        compass.setSamples(QMC5883_SAMPLES_8);
+   }
+    Serial.println("calibration rotating!");
+ 
   }
-  delay(1000);
-  decided_Millis = millis()+10000;
-  Serial.println(millis());
-  Serial.println(decided_Millis);
-}
+void loop()
+{
+  Vector norm = compass.readNormalize();
 
-void loop() {
-  Vector mag = compass.readRaw();
-  switch(phase4){
-    case 1:
-    {
-      maxX = mag.XAxis;
-      maxY = mag.YAxis;
-      maxZ = mag.ZAxis;
-      minX = mag.XAxis;
-      minY = mag.YAxis;
-      minZ = mag.ZAxis;
-      phase4 = 2;
+  switch(calibration){
+  case 1:
+    //rotating();  //testcodeでは手動で回す．
+    if(CalibrationCounter == 500){
+      //stopping;
+      Serial.println("calibration stopping!");
+      delay(2000);
+      calibration = 2;
+    }else{
+      CalibrationCounter = CalibrationCounter + 1;
+      Serial.print("CalibrationCounter = ");
+      Serial.println(CalibrationCounter);
     }
-
-    case 2:
-    {
-    //rotating();
-    if(mag.XAxis > maxX) maxX = mag.XAxis;
-    if(mag.YAxis > maxY) maxY = mag.YAxis;
-    if(mag.ZAxis > maxZ) maxZ = mag.ZAxis;
-
-    if(mag.XAxis < minX) minX = mag.XAxis;
-    if(mag.YAxis < minY) minY = mag.YAxis;
-    if(mag.ZAxis < minZ) minZ = mag.ZAxis;
-
-    current_Millis = millis();
-    //Serial.println(current_Millis);
-    if (current_Millis > decided_Millis){
-      Serial.println(current_Millis);
-      Serial.println(decided_Millis);
-      phase4 = 3;
-      //stopping();
-      offsetX = (maxX + minX)/2;
-      offsetY = (maxY + minY)/2;
-      offsetZ = (maxZ + minZ)/2;
-      Serial.print("max=  ");
-      Serial.print(maxX);
-      Serial.print(",");
-      Serial.print(maxY);
-      Serial.print(",");
-      Serial.println(maxZ);
-
-      Serial.print("min=  ");
-      Serial.print(minX);
-      Serial.print(",");
-      Serial.print(minY);
-      Serial.print(",");
-      Serial.println(minZ);
-      
-      Serial.print("off=  ");
-      Serial.print(offsetX);
-      Serial.print(",");
-      Serial.print(offsetY);
-      Serial.print(",");
-      Serial.println(offsetZ);
-    }
+    delay(200);　　//私のパソコンが重すぎたので足しただけ．無くしても大丈夫
     break;
+  case 2:
+    
+    // Calculate heading
+    float heading = atan2(norm.YAxis, norm.XAxis);
+  
+    // Set declination angle on your location and fix heading
+    // You can find your declination on: http://magnetic-declination.com/
+    // (+) Positive or (-) for negative
+    // For Bytom / Poland declination angle is 4'26E (positive)
+    // Formula: (deg + (min / 60.0)) / (180 / M_PI);
+    //float declinationAngle = (4.0 + (26.0 / 60.0)) / (180 / PI);
+    float declinationAngle = (-7.0 + (46.0 / 60.0)) / (180 / PI);
+    heading += declinationAngle;
+    //Serial.println(heading);
+    //heading -= PI;
+    //heading += PI/3;
+    //heading += PI/2;
+    //Serial.println(heading);
+    
+    // Correct for heading < 0deg and heading > 360deg
+    if (heading < 0){
+      heading += 2 * PI;
     }
-    case 3:
-    {
-    current_Millis = millis();
-    //Serial.println(current_Millis);
-    /*
-    mag_X = mag.XAxis;
-    mag_Y = mag.YAxis;
-    mag_Z = mag.ZAxis;
-    Serial.print(mag_X);
+  
+    if (heading > 2 * PI){
+      heading -= 2 * PI;
+    }
+  
+    // Convert to degrees
+    float headingDegrees = heading * 180/M_PI; 
+  
+  
+  
+    Serial.print("Heading = ");
+    Serial.print(heading);
     Serial.print(",");
-    Serial.print(mag_Y);
-    Serial.print(",");
-    Serial.println(mag_Z);
-    */
-    mag_X = mag.XAxis - offsetX;
-    mag_Y = mag.YAxis - offsetY;
-    mag_Z = mag.ZAxis - offsetZ;
-    Serial.print(mag_X);
-    Serial.print(",");
-    Serial.print(mag_Y);
-    Serial.print(",");
-    Serial.println(mag_Z);
-    
-    //theta = atan2(mag_Y,mag_X);
-    //Serial.println(theta);
-    
-
-    //delay(10000);
+    Serial.print(headingDegrees);
+    Serial.println();
+  
+    delay(200);  //私のパソコンが重すぎたので足しただけ．無くしても大丈夫
     break;
-    }
   }
 }
