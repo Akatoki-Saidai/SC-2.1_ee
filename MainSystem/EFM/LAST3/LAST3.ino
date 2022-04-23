@@ -283,7 +283,7 @@ void accel(){
       ledcWrite(1,i);
       ledcWrite(2,0);
       ledcWrite(3,i);
-      delay(50);//stoppingではdelay使う
+      delay(50);//accelではdelay使う
     }  
 }
 
@@ -296,6 +296,7 @@ void stopping(){
       ledcWrite(2,0);
       ledcWrite(3,i);
       delay(100);//stoppingではdelay使う
+      //delay(80);の方が，最後曲がらずにすむかも
     }
 }
 
