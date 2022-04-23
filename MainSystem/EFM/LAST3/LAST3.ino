@@ -79,6 +79,17 @@ double current_altitude;
 //for phase4
 int CalibrationCounter = 1;
 int calibration = 1;
+double CurrentDistance;
+double heading;
+double declinationAngle;
+double headingDegrees;
+double Angle_gy270;
+double Angle_Goal;
+double Angle_gps;
+double Angle_heading;
+double rrAngle,llAngle;
+
+
   
 //you need to set up variables at first
 double GOAL_lat = 35.861236667;
@@ -101,10 +112,6 @@ double Pre_distance;
 double heading_data;
 double heading_array[5];
 double heading_sum = 0;
-double heading;
-double rotate_degree = 0;
-double rotate_sec = 0;
-double headingDegrees;
 double omega;
 double azimuth;
 
@@ -733,7 +740,7 @@ void loop() {
 
                 }
                 
-                double CurrentDistance = CalculateDis(GOAL_lng, GOAL_lat, gps_longitude, gps_latitude);
+                CurrentDistance = CalculateDis(GOAL_lng, GOAL_lat, gps_longitude, gps_latitude);
                 Serial.print("CurrentDistance=");Serial.println(CurrentDistance);
                 
                 if(desiredDistance >= CurrentDistance){
@@ -769,14 +776,14 @@ void loop() {
                         Vector norm = compass.readNormalize();
 
                         // Calculate heading
-                        double heading = atan2(norm.YAxis, norm.XAxis);
+                        heading = atan2(norm.YAxis, norm.XAxis);
 
                         // Set declination angle on your location and fix heading
                         // You can find your declination on: http://magnetic-declination.com/
                         // (+) Positive or (-) for negative
                         // For Bytom / Poland declination angle is 4'26E (positive)
                         // Formula: (deg + (min / 60.0)) / (180 / M_PI);
-                        double declinationAngle = (-7.0 + (46.0 / 60.0)) / (180 / PI);
+                        declinationAngle = (-7.0 + (46.0 / 60.0)) / (180 / PI);
                         heading += declinationAngle;
 
                         // Correct for heading < 0deg and heading > 360deg
@@ -789,7 +796,7 @@ void loop() {
                         }
 
                         // Convert to degrees
-                        double headingDegrees = heading * 180/M_PI;
+                        headingDegrees = heading * 180/M_PI;
 
                         if (headingDegrees < 0){
                           headingDegrees += 360;
@@ -804,12 +811,12 @@ void loop() {
                         delay(100);
                       }
 
-                      double Angle_gy270 = Sum_headingDegrees/15;
+                      Angle_gy270 = Sum_headingDegrees/15;
                       
-                      double Angle_Goal = CalculateAngle(GOAL_lng, GOAL_lat, gps_longitude, gps_latitude);
-                      double Angle_gps = CalculateAngle(gps_longitude, gps_latitude, pre_gps_longitude,pre_gps_latitude);
+                      Angle_Goal = CalculateAngle(GOAL_lng, GOAL_lat, gps_longitude, gps_latitude);
+                      Angle_gps = CalculateAngle(gps_longitude, gps_latitude, pre_gps_longitude,pre_gps_latitude);
 
-                      double Angle_heading = w*Angle_gy270 + (1 - w) * Angle_gps;
+                      Angle_heading = w*Angle_gy270 + (1 - w) * Angle_gps;
 
                       CanSatLogData.println(gps_time);
                       CanSatLogData.println("Angle_gy270=");CanSatLogData.println(Angle_gy270);    
@@ -818,7 +825,7 @@ void loop() {
                       CanSatLogData.print("Angle_heading");CanSatLogData.println(Angle_heading);                      
                       CanSatLogData.flush();
 
-                      double rrAngle = - Angle_heading + Angle_Goal;
+                      rrAngle = - Angle_heading + Angle_Goal;
 
                       if (rrAngle < 0){
                           rrAngle += 360;
@@ -829,7 +836,7 @@ void loop() {
                         }
 
 
-                      double llAngle = Angle_heading - Angle_Goal;
+                      llAngle = Angle_heading - Angle_Goal;
 
                       if (llAngle < 0){
                           llAngle += 360;
@@ -853,14 +860,14 @@ void loop() {
                           Vector norm = compass.readNormalize();
   
                           // Calculate heading
-                          double heading = atan2(norm.YAxis, norm.XAxis);
+                          heading = atan2(norm.YAxis, norm.XAxis);
   
                           // Set declination angle on your location and fix heading
                           // You can find your declination on: http://magnetic-declination.com/
                           // (+) Positive or (-) for negative
                           // For Bytom / Poland declination angle is 4'26E (positive)
                           // Formula: (deg + (min / 60.0)) / (180 / M_PI);
-                          double declinationAngle = (-7.0 + (46.0 / 60.0)) / (180 / PI);
+                          declinationAngle = (-7.0 + (46.0 / 60.0)) / (180 / PI);
                           heading += declinationAngle;
   
                           // Correct for heading < 0deg and heading > 360deg
@@ -873,7 +880,7 @@ void loop() {
                           }
   
                           // Convert to degrees
-                          double headingDegrees = heading * 180/M_PI;
+                          headingDegrees = heading * 180/M_PI;
   
                           if (headingDegrees < 0){
                             headingDegrees += 360;
@@ -892,14 +899,14 @@ void loop() {
                             Vector norm = compass.readNormalize();
   
                             // Calculate heading
-                            double heading = atan2(norm.YAxis, norm.XAxis);
+                            heading = atan2(norm.YAxis, norm.XAxis);
     
                             // Set declination angle on your location and fix heading
                             // You can find your declination on: http://magnetic-declination.com/
                             // (+) Positive or (-) for negative
                             // For Bytom / Poland declination angle is 4'26E (positive)
                             // Formula: (deg + (min / 60.0)) / (180 / M_PI);
-                            double declinationAngle = (-7.0 + (46.0 / 60.0)) / (180 / PI);
+                            declinationAngle = (-7.0 + (46.0 / 60.0)) / (180 / PI);
                             heading += declinationAngle;
     
                             // Correct for heading < 0deg and heading > 360deg
@@ -912,7 +919,7 @@ void loop() {
                             }
     
                             // Convert to degrees
-                            double headingDegrees = heading * 180/M_PI;
+                            headingDegrees = heading * 180/M_PI;
     
                             if (headingDegrees < 0){
                               headingDegrees += 360;
@@ -943,14 +950,14 @@ void loop() {
                           Vector norm = compass.readNormalize();
   
                           // Calculate heading
-                          double heading = atan2(norm.YAxis, norm.XAxis);
+                          heading = atan2(norm.YAxis, norm.XAxis);
   
                           // Set declination angle on your location and fix heading
                           // You can find your declination on: http://magnetic-declination.com/
                           // (+) Positive or (-) for negative
                           // For Bytom / Poland declination angle is 4'26E (positive)
                           // Formula: (deg + (min / 60.0)) / (180 / M_PI);
-                          double declinationAngle = (-7.0 + (46.0 / 60.0)) / (180 / PI);
+                          declinationAngle = (-7.0 + (46.0 / 60.0)) / (180 / PI);
                           heading += declinationAngle;
   
                           // Correct for heading < 0deg and heading > 360deg
@@ -963,7 +970,7 @@ void loop() {
                           }
   
                           // Convert to degrees
-                          double headingDegrees = heading * 180/M_PI;
+                          headingDegrees = heading * 180/M_PI;
   
                           if (headingDegrees < 0){
                             headingDegrees += 360;
@@ -981,14 +988,14 @@ void loop() {
                             Vector norm = compass.readNormalize();
  
                             // Calculate heading
-                            double heading = atan2(norm.YAxis, norm.XAxis);
+                            heading = atan2(norm.YAxis, norm.XAxis);
     
                             // Set declination angle on your location and fix heading
                             // You can find your declination on: http://magnetic-declination.com/
                             // (+) Positive or (-) for negative
                             // For Bytom / Poland declination angle is 4'26E (positive)
                             // Formula: (deg + (min / 60.0)) / (180 / M_PI);
-                            double declinationAngle = (-7.0 + (46.0 / 60.0)) / (180 / PI);
+                            declinationAngle = (-7.0 + (46.0 / 60.0)) / (180 / PI);
                             heading += declinationAngle;
     
                             // Correct for heading < 0deg and heading > 360deg
@@ -1001,7 +1008,7 @@ void loop() {
                             }
     
                             // Convert to degrees
-                            double headingDegrees = heading * 180/M_PI;
+                            headingDegrees = heading * 180/M_PI;
     
                             if (headingDegrees < 0){
                               headingDegrees += 360;
@@ -1012,7 +1019,6 @@ void loop() {
                             }//地磁気のプログラム終了
                             Serial.print("fabs(rrAngle - headingDegrees)2=");                            
                             Serial.println(fabs(rrAngle - headingDegrees));
-                            rrAngle = 10 + headingDegrees ;
                               
                           }
                           
