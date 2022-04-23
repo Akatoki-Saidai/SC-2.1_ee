@@ -10,7 +10,7 @@ double aX, aY, aZ, aSqrt, gX, gY, gZ, mDirection, mX, mY, mZ;
 DFRobot_QMC5883 compass;
 TinyGPSPlus gps;
 
-int phase = 5;
+int phase = 4;
 char key = '0';
 const int SAMPLING_RATE = 200;
 int phase_state = 0;
@@ -81,8 +81,8 @@ int CalibrationCounter = 1;
 int calibration = 1;
   
 //you need to set up variables at first
-double GOAL_lat = 35.859889;
-double GOAL_lng = 139.607189;
+double GOAL_lat = 35.861236667;
+double GOAL_lng = 139.608596667;
 
 //variables___GPS
 //緯度
@@ -147,7 +147,7 @@ unsigned long time2;
 
 double Sum_headingDegrees;
 
-double w = 0.7; //地磁気センサーの信頼係数
+double w = 0; //地磁気センサーの信頼係数
 
 double desiredDistance = 2.0; //遠距離フェーズから近距離フェーズに移行する距離
 
@@ -207,18 +207,18 @@ double CalculateAngle(double GOAL_lng, double GOAL_lat, double gps_longitude, do
 
 //前進
 void forward(){
-  ledcWrite(0, 127); //channel, duty
-  ledcWrite(1, 0);
-  ledcWrite(2, 127);
-  ledcWrite(3, 0);
+  ledcWrite(0, 0); //channel, duty
+  ledcWrite(1, 127);
+  ledcWrite(2, 0);
+  ledcWrite(3, 127);
 }
 
 //ターボ
 void turbo(){
-  ledcWrite(0, 255); //channel, duty
-  ledcWrite(1, 0);
-  ledcWrite(2, 255);
-  ledcWrite(3, 0);
+  ledcWrite(0, 0); //channel, duty
+  ledcWrite(1, 255);
+  ledcWrite(2, 0);
+  ledcWrite(3, 255);
 }
 
 //後転
@@ -256,7 +256,7 @@ void rightturn(){
 
 //回転
 void rotating(){
-  ledcWrite(0, 50);
+  ledcWrite(0, 70);
   ledcWrite(1, 0);
   ledcWrite(2, 0);
   ledcWrite(3, 50);
@@ -264,18 +264,18 @@ void rotating(){
 //反回転
 void reverse_rotating(){
   ledcWrite(0, 0);
-  ledcWrite(1, 120);
-  ledcWrite(2, 120);
+  ledcWrite(1, 70);
+  ledcWrite(2, 50);
   ledcWrite(3, 0);  
 }
 
 //ゆっくり加速
 void accel(){
     for(int i=0;i<127;i=i+5){
-      ledcWrite(0,i);
-      ledcWrite(1,0);
-      ledcWrite(2,i);
-      ledcWrite(3,0);
+      ledcWrite(0,0);
+      ledcWrite(1,i);
+      ledcWrite(2,0);
+      ledcWrite(3,i);
       delay(50);//stoppingではdelay使う
     }  
 }
@@ -415,7 +415,7 @@ void setup() {
           compass.setSamples(QMC5883_SAMPLES_8);
      }
       Serial.println("calibration rotating!");
-      while(CalibrationCounter < 550){
+      while(CalibrationCounter < 551){
         Vector norm = compass.readNormalize();
         rotating();  //testcodeでは手動で回す．
         if(CalibrationCounter == 550){
@@ -423,6 +423,7 @@ void setup() {
           Serial.println("calibration stopping!");
           delay(2000);
           calibration = 2;
+          CalibrationCounter = CalibrationCounter + 1;
         }else{
           CalibrationCounter = CalibrationCounter + 1;
           Serial.print("CalibrationCounter = ");
@@ -838,11 +839,15 @@ void loop() {
                           llAngle -= 360;
                         }
 
+                      Serial.print("rrAngle = ");
+                      Serial.println(rrAngle);
+                      
+                      Serial.print("llAngle = ");
+                      Serial.println(llAngle);
 
                       if (rrAngle > llAngle){
                         //反時計回り
                         if (llAngle > 20){
-                          rotating();
                           
                           //地磁気のプログラム
                           Vector norm = compass.readNormalize();
@@ -878,7 +883,8 @@ void loop() {
                             headingDegrees -= 360;
                           }//地磁気のプログラム終了
                           
-                          while(abs(llAngle - headingDegrees) > 20){
+                          while(fabs(llAngle - headingDegrees) > 20){
+                            rotating();
                             
                             //地磁気のプログラム
                             Vector norm = compass.readNormalize();
@@ -913,9 +919,12 @@ void loop() {
                             if (headingDegrees > 360){
                               headingDegrees -= 360;
                             }//地磁気のプログラム終了
+                            Serial.print("fabs(llAngle - headingDegrees)=");                            
+                            Serial.println(fabs(llAngle - headingDegrees));
                               
                           }
                         }else{
+                          stoppage();
                           accel();
                           turbo();
                           delay(2000);
@@ -925,7 +934,6 @@ void loop() {
                       }else{
                         //時計回り
                         if(rrAngle > 20){
-                          reverse_rotating();
                           
                           //地磁気のプログラム
                           Vector norm = compass.readNormalize();
@@ -961,8 +969,8 @@ void loop() {
                             headingDegrees -= 360;
                           }//地磁気のプログラム終了
                           
-                          while(abs(rrAngle - headingDegrees) > 20){
-                            
+                          while(fabs(rrAngle - headingDegrees) > 20){
+                            reverse_rotating();                           
                             //地磁気のプログラム
                             Vector norm = compass.readNormalize();
  
@@ -996,10 +1004,13 @@ void loop() {
                             if (headingDegrees > 360){
                               headingDegrees -= 360;
                             }//地磁気のプログラム終了
+                            Serial.print("fabs(rrAngle - headingDegrees)=");                            
+                            Serial.println(fabs(rrAngle - headingDegrees));
                               
                           }
                           
                         }else{
+                          stoppage();
                           accel();
                           turbo();
                           delay(2000);
