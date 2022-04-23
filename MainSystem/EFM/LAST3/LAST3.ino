@@ -147,7 +147,7 @@ unsigned long time2;
 
 double Sum_headingDegrees;
 
-double w = 0; //地磁気センサーの信頼係数
+double w = 0.7; //地磁気センサーの信頼係数
 
 double desiredDistance = 2.0; //遠距離フェーズから近距離フェーズに移行する距離
 
@@ -843,6 +843,8 @@ void loop() {
                         //反時計回り
                         if (llAngle > 20){
                           rotating();
+                          
+                          //地磁気のプログラム
                           Vector norm = compass.readNormalize();
   
                           // Calculate heading
@@ -874,7 +876,7 @@ void loop() {
   
                           if (headingDegrees > 360){
                             headingDegrees -= 360;
-                          }
+                          }//地磁気のプログラム終了
                           
                           while(abs(llAngle - headingDegrees) > 20){
                             
@@ -924,6 +926,8 @@ void loop() {
                         //時計回り
                         if(rrAngle > 20){
                           reverse_rotating();
+                          
+                          //地磁気のプログラム
                           Vector norm = compass.readNormalize();
   
                           // Calculate heading
@@ -955,7 +959,7 @@ void loop() {
   
                           if (headingDegrees > 360){
                             headingDegrees -= 360;
-                          }
+                          }//地磁気のプログラム終了
                           
                           while(abs(rrAngle - headingDegrees) > 20){
                             
@@ -991,9 +995,9 @@ void loop() {
     
                             if (headingDegrees > 360){
                               headingDegrees -= 360;
-                            }
+                            }//地磁気のプログラム終了
                               
-                          }//地磁気のプログラム終了
+                          }
                           
                         }else{
                           accel();
