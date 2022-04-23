@@ -884,6 +884,8 @@ void loop() {
                           }//地磁気のプログラム終了
                           
                           while(fabs(llAngle - headingDegrees) > 20){
+                            Serial.print("fabs(llAngle - headingDegrees)1=");                            
+                            Serial.println(fabs(llAngle - headingDegrees));
                             rotating();
                             
                             //地磁気のプログラム
@@ -919,10 +921,12 @@ void loop() {
                             if (headingDegrees > 360){
                               headingDegrees -= 360;
                             }//地磁気のプログラム終了
-                            Serial.print("fabs(llAngle - headingDegrees)=");                            
+                            Serial.print("fabs(llAngle - headingDegrees)2=");                            
                             Serial.println(fabs(llAngle - headingDegrees));
-                              
+                        
                           }
+                          Serial.println("test");
+                          
                         }else{
                           stoppage();
                           accel();
@@ -970,6 +974,8 @@ void loop() {
                           }//地磁気のプログラム終了
                           
                           while(fabs(rrAngle - headingDegrees) > 20){
+                            Serial.print("fabs(rrAngle - headingDegrees)1=");                            
+                            Serial.println(fabs(rrAngle - headingDegrees));
                             reverse_rotating();                           
                             //地磁気のプログラム
                             Vector norm = compass.readNormalize();
@@ -1004,8 +1010,9 @@ void loop() {
                             if (headingDegrees > 360){
                               headingDegrees -= 360;
                             }//地磁気のプログラム終了
-                            Serial.print("fabs(rrAngle - headingDegrees)=");                            
+                            Serial.print("fabs(rrAngle - headingDegrees)2=");                            
                             Serial.println(fabs(rrAngle - headingDegrees));
+                            rrAngle = 10 + headingDegrees ;
                               
                           }
                           
@@ -1018,7 +1025,7 @@ void loop() {
                         }
                       }
                       
-
+                      Serial.println("LONGDISPHASE=");   
                       LongDis_phase = 0;
                       break;
                     }
