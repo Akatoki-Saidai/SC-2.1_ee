@@ -10,7 +10,7 @@ double aX, aY, aZ, aSqrt, gX, gY, gZ, mDirection, mX, mY, mZ;
 DFRobot_QMC5883 compass;
 TinyGPSPlus gps;
 
-int phase = 4;
+int phase = 5;
 char key = '0';
 const int SAMPLING_RATE = 200;
 int phase_state = 0;
@@ -154,7 +154,7 @@ unsigned long time2;
 
 double Sum_headingDegrees;
 
-double w = 0; //地磁気センサーの信頼係数
+double w = 1; //地磁気センサーの信頼係数
 
 double desiredDistance = 2.0; //遠距離フェーズから近距離フェーズに移行する距離
 
@@ -217,7 +217,7 @@ void forward(){
   ledcWrite(0, 0); //channel, duty
   ledcWrite(1, 127);
   ledcWrite(2, 0);
-  ledcWrite(3, 127);
+  ledcWrite(3, 107);
 }
 
 //ターボ
@@ -266,19 +266,19 @@ void rotating(){
   ledcWrite(0, 70);
   ledcWrite(1, 0);
   ledcWrite(2, 0);
-  ledcWrite(3, 50);
+  ledcWrite(3, 70);
 }
 //反回転
 void reverse_rotating(){
   ledcWrite(0, 0);
-  ledcWrite(1, 70);
-  ledcWrite(2, 50);
+  ledcWrite(1, 80);
+  ledcWrite(2, 70);
   ledcWrite(3, 0);  
 }
 
 //ゆっくり加速
 void accel(){
-    for(int i=0;i<127;i=i+5){
+    for(int i=0;i<60;i=i+5){
       ledcWrite(0,0);
       ledcWrite(1,i);
       ledcWrite(2,0);
@@ -290,12 +290,12 @@ void accel(){
 
 //ゆっくり停止
 void stopping(){
-    for(int i=60;i>0;i=i-5){
-      ledcWrite(0,i);
-      ledcWrite(1,0);
-      ledcWrite(2,i);
-      ledcWrite(3,0);
-      delay(50);//stoppingではdelay使う
+    for(int i=100;i>0;i=i-5){
+      ledcWrite(0,0);
+      ledcWrite(1,i);
+      ledcWrite(2,0);
+      ledcWrite(3,i);
+      delay(100);//stoppingではdelay使う
     }
 }
 
@@ -421,6 +421,8 @@ void setup() {
           compass.setDataRate(QMC5883_DATARATE_50HZ);
           compass.setSamples(QMC5883_SAMPLES_8);
      }
+      forward();
+      delay(500);
       Serial.println("calibration rotating!");
       while(CalibrationCounter < 551){
         Vector norm = compass.readNormalize();
@@ -761,7 +763,7 @@ void loop() {
                     case 1:{
                       //まっすぐ進む
                       forward();
-                      delay(4000);
+                      delay(1000);
                       stopping();
                       LongDis_phase = 2;
                       break;
@@ -889,7 +891,7 @@ void loop() {
                           if (headingDegrees > 360){
                             headingDegrees -= 360;
                           }//地磁気のプログラム終了
-                          
+
                           while(fabs(llAngle - headingDegrees) > 20){
                             Serial.print("fabs(llAngle - headingDegrees)1=");                            
                             Serial.println(fabs(llAngle - headingDegrees));
@@ -937,8 +939,8 @@ void loop() {
                         }else{
                           stoppage();
                           accel();
-                          turbo();
-                          delay(2000);
+                          forward();
+                          delay(1000);
                           stopping();
                         }
 
@@ -1025,7 +1027,7 @@ void loop() {
                         }else{
                           stoppage();
                           accel();
-                          turbo();
+                          forward();
                           delay(2000);
                           stopping();
                         }
