@@ -827,10 +827,10 @@ void loop()
             // カラーコーンとの距離が理想値よりも小さい場合は次のフェーズに移行する
             phase = 5;
           }else{
-            delay(1000);
+            delay(100);
             accel();
             forward();
-            delay(2000);
+            delay(1000);
             stopping();
             // Goalまでの偏角を計算する
             Angle_Goal = CalculateAngle(GOAL_lng, GOAL_lat, gps_longitude, gps_latitude);
