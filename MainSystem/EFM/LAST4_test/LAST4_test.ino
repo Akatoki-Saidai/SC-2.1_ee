@@ -228,7 +228,7 @@ void turbo()
   ledcWrite(0, 0); // channel, duty
   ledcWrite(1, 255);
   ledcWrite(2, 0);
-  ledcWrite(3, 255);
+  ledcWrite(3, 235);
 }
 
 //後転
@@ -252,8 +252,8 @@ void stoppage()
 //右旋回
 void leftturn()
 {
-  ledcWrite(0, 70);
-  ledcWrite(1, 0);
+  ledcWrite(0, 0);
+  ledcWrite(1, 70);
   ledcWrite(2, 0);
   ledcWrite(3, 0);
 }
@@ -263,51 +263,50 @@ void rightturn()
 {
   ledcWrite(0, 0);
   ledcWrite(1, 0);
-  ledcWrite(2, 70);
-  ledcWrite(3, 0);
+  ledcWrite(2, 0);
+  ledcWrite(3, 70);
 }
 
 //回転
 void rotating()
-{
-  ledcWrite(0, 70);
-  ledcWrite(1, 0);
-  ledcWrite(2, 0);
-  ledcWrite(3, 70);
-}
-//反回転
-void reverse_rotating()
 {
   ledcWrite(0, 0);
   ledcWrite(1, 70);
   ledcWrite(2, 70);
   ledcWrite(3, 0);
 }
+//反回転
+void reverse_rotating()
+{
+  ledcWrite(0, 70);
+  ledcWrite(1, 0);
+  ledcWrite(2, 0);
+  ledcWrite(3, 70);
+}
 
 //ゆっくり加速
 void accel()
 {
-  for (int i = 0; i < 60; i = i + 5)
+  for (int i = 0; i < 127; i = i + 5)
   {
     ledcWrite(0, 0);
     ledcWrite(1, i);
     ledcWrite(2, 0);
     ledcWrite(3, i);
-    delay(50); // accelではdelay使う
+    delay(80); // accelではdelay使う
   }
 }
 
 //ゆっくり停止
 void stopping()
 {
-  for (int i = 100; i > 0; i = i - 5)
+  for (int i = 127; i > 0; i = i - 5)
   {
     ledcWrite(0, 0);
     ledcWrite(1, i);
     ledcWrite(2, 0);
     ledcWrite(3, i);
-    delay(100); // stoppingではdelay使う
-    // delay(80);の方が，最後曲がらずにすむかも
+    delay(80); // stoppingではdelay使う
   }
 }
 
@@ -448,8 +447,8 @@ void setup()
     compass.setDataRate(QMC5883_DATARATE_50HZ);
     compass.setSamples(QMC5883_SAMPLES_8);
   }
-  forward();
-  delay(500);
+  leftturn();
+  delay(100);
   Serial.println("calibration rotating!");
   while (CalibrationCounter < 551)
   {
@@ -603,7 +602,7 @@ void loop()
             // LogDataの保存
             CanSatLogData.println(gps_time);
             CanSatLogData.println("Phase1: transition completed");
-            CanSatLogDaa.flush();
+            CanSatLogData.flush();
 
             phase_state = 1;
           }
@@ -882,17 +881,19 @@ void loop()
         if (rrAngle > llAngle){
           //反時計回り
           if (llAngle > 20){
-            lefturn();
+            leftturn();
+            delay(100);
             rotating();
-            delay(500);
+            delay(400);
             stoppage();
           }
         }else{
           //時計回り
           if (rrAngle > 20){
             rightturn();
+            delay(100);
             reverse_rotating();
-            delay(500);
+            delay(400);
             stoppage();
           }
         }
@@ -937,6 +938,8 @@ void loop()
             CanSatLogData.println(gps_time);
             CanSatLogData.println("searching for the goal...");
             CanSatLogData.flush();
+            leftturn();
+            delay(100);
             rotating();
             if (ultra_distance < 300 && ultra_distance != 0)
             {
