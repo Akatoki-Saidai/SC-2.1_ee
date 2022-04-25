@@ -252,7 +252,7 @@ void stoppage()
 //右旋回
 void leftturn()
 {
-  ledcWrite(0, 63);
+  ledcWrite(0, 70);
   ledcWrite(1, 0);
   ledcWrite(2, 0);
   ledcWrite(3, 0);
@@ -263,7 +263,7 @@ void rightturn()
 {
   ledcWrite(0, 0);
   ledcWrite(1, 0);
-  ledcWrite(2, 63);
+  ledcWrite(2, 70);
   ledcWrite(3, 0);
 }
 
@@ -279,7 +279,7 @@ void rotating()
 void reverse_rotating()
 {
   ledcWrite(0, 0);
-  ledcWrite(1, 80);
+  ledcWrite(1, 70);
   ledcWrite(2, 70);
   ledcWrite(3, 0);
 }
@@ -882,6 +882,7 @@ void loop()
         if (rrAngle > llAngle){
           //反時計回り
           if (llAngle > 20){
+            lefturn();
             rotating();
             delay(500);
             stoppage();
@@ -889,6 +890,7 @@ void loop()
         }else{
           //時計回り
           if (rrAngle > 20){
+            rightturn();
             reverse_rotating();
             delay(500);
             stoppage();
