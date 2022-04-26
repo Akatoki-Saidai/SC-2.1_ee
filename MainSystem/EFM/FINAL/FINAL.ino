@@ -279,6 +279,16 @@ void rotating()
   ledcWrite(2, 70);
   ledcWrite(3, 0);
 }
+
+//ゆっくり回転
+void phase4_rotating()
+{
+  ledcWrite(0, 0);
+  ledcWrite(1, 60);
+  ledcWrite(2, 60);
+  ledcWrite(3, 0);
+}
+
 //反回転
 void reverse_rotating()
 {
@@ -959,7 +969,7 @@ void loop()
             CanSatLogData.flush();
             leftturn();
             delay(100);
-            rotating();
+            phase4_rotating();
             if (ultra_distance < 600 && ultra_distance != 0)
             {
               phase_5 = 0;
