@@ -284,7 +284,7 @@ void rotating()
 }
 
 //ゆっくり回転
-void phase4_rotating()
+void slow_rotating()
 {
   ledcWrite(0, 0);
   ledcWrite(1, 60);
@@ -974,16 +974,48 @@ void loop()
           Serial.print("CurrentDistance=");
           Serial.println(CurrentDistance);
 
-          if (2.0 >= CurrentDistance || ){
+          if (2.0 >= CurrentDistance || ultra_distance < 600 && ultra_distance != 0){
             // カラーコーンとの距離が理想値よりも小さい場合は次のフェーズに移行する
             phase = 5;
           }else{
             //　ここにお願い！
 
+            // ゆっくり回転開始
+            slow_rotating();
+            
+            // Goalまでの偏角を計算する
+            Angle_Goal = CalculateAngle(GOAL_lng, GOAL_lat, gps_longitude, gps_latitude);
+            Vector norm = compass.readNormalize();
+            heading = atan2(norm.YAxis, norm.XAxis);
+            declinationAngle = (-7.0 + (46.0 / 60.0)) / (180 / PI);
+            heading += declinationAngle;
+            if (heading < 0){
+              heading += 2 * PI;
+            }
+            if (heading > 2 * PI){
+              heading -= 2 * PI;
+            }
 
-          }
-        break;
+            // Convert to degrees
+            headingDegrees = heading * 180 / M_PI;
+
+            if (headingDegrees < 0){
+              headingDegrees += 360;
+            }
+
+            if (headingDegrees > 360){
+              headingDegrees -= 360;
+            }
+
+            if(fabs(headingDegrees - Angle_Goal)<10){
+              stoppage();
+            }
+
+            //少し進む(ここにお願い!)
+            
         }
+        break;}
+        
 
         //########## 近距離探索フェーズ ##########
         case 5:
@@ -1027,7 +1059,7 @@ void loop()
             CanSatLogData.flush();
             leftturn();
             delay(100);
-            phase4_rotating();
+            slow_rotating();
             if (ultra_distance < 600 && ultra_distance != 0)
             {
               phase_5 = 0;
@@ -1040,10 +1072,10 @@ void loop()
               CanSatLogData.println("goal is detected!");
               CanSatLogData.flush();
             }
-
             if(current_Millis - previous_Millis > 10000){
-              phase = 4;
+              phase = 0;
             }
+            
             break;
 
           case 0:
