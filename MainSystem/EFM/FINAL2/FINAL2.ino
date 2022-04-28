@@ -981,13 +981,10 @@ void loop()
             phase = 5;
           }else{
             Angle_Goal = CalculateAngle(GOAL_lng, GOAL_lat, gps_longitude, gps_latitude);
-            //　ここにお願い！
 
             // ゆっくり回転開始
             slow_rotating();
             
-            // Goalまでの偏角を計算する
-            Angle_Goal = CalculateAngle(GOAL_lng, GOAL_lat, gps_longitude, gps_latitude);
             Vector norm = compass.readNormalize();
             heading = atan2(norm.YAxis, norm.XAxis);
             declinationAngle = (-7.0 + (46.0 / 60.0)) / (180 / PI);
