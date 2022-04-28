@@ -158,7 +158,7 @@ double Sum_headingDegrees;
 
 double w = 1; //地磁気センサーの信頼係数
 
-double desiredDistance = 1.5; //遠距離フェーズから近距離フェーズに移行する距離
+double desiredDistance = 10.0; //遠距離フェーズから中距離フェーズに移行する距離
 
 double pre_gps_latitude, pre_gps_longitude;
 int LongDis_phase = 0;
@@ -976,7 +976,7 @@ void loop()
           Serial.print("CurrentDistance=");
           Serial.println(CurrentDistance);
 
-          if (2.0 >= CurrentDistance || ultra_distance < 600 && ultra_distance != 0){
+          if (2.0 >= CurrentDistance || ultra_distance < 600 && (ultra_distance != 0)){
             // カラーコーンとの距離が理想値よりも小さい場合は次のフェーズに移行する
             phase = 5;
           }else{
@@ -1073,11 +1073,7 @@ void loop()
               CanSatLogData.println(gps_time);
               CanSatLogData.println("goal is detected!");
               CanSatLogData.flush();
-            }
-            if(current_Millis - previous_Millis > 10000){
-              phase = 0;
-            }
-            
+            }          
             break;
 
           case 0:
