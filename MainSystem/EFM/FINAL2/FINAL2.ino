@@ -893,42 +893,44 @@ void loop()
                 Sum_headingDegrees += headingDegrees;
               }
               Angle_gy270 = Sum_headingDegrees / 15;
-        }
-        // どちらに回ればいいか計算
-          rrAngle = -Angle_gy270 + Angle_Goal;
-          if (rrAngle < 0){
-            rrAngle += 360;
-          }
-          if (rrAngle > 360){
-            rrAngle -= 360;
-          }
-          llAngle = Angle_gy270 - Angle_Goal;
-          if (llAngle < 0){
-            llAngle += 360;
-          }
-          if (llAngle > 360){
-            llAngle -= 360;
-          }
 
-        if (rrAngle > llAngle){
-          //反時計回り
-          if (llAngle > 20){
-            leftturn();
-            delay(100);
-            rotating();
-            delay(400);
-            stoppage();
+              // どちらに回ればいいか計算
+              rrAngle = -Angle_gy270 + Angle_Goal;
+              if (rrAngle < 0){
+                rrAngle += 360;
+              }
+              if (rrAngle > 360){
+                rrAngle -= 360;
+              }
+              llAngle = Angle_gy270 - Angle_Goal;
+              if (llAngle < 0){
+                llAngle += 360;
+              }
+              if (llAngle > 360){
+                llAngle -= 360;
+              }
+
+            if (rrAngle > llAngle){
+              //反時計回り
+              if (llAngle > 20){
+                leftturn();
+                delay(100);
+                rotating();
+                delay(400);
+                stoppage();
+              }
+            }else{
+              //時計回り
+              if (rrAngle > 20){
+                rightturn();
+                delay(100);
+                reverse_rotating();
+                delay(400);
+                stoppage();
+              }
+            }
           }
-        }else{
-          //時計回り
-          if (rrAngle > 20){
-            rightturn();
-            delay(100);
-            reverse_rotating();
-            delay(400);
-            stoppage();
-          }
-        }
+        
         break;
         }
 
@@ -978,9 +980,14 @@ void loop()
             // カラーコーンとの距離が理想値よりも小さい場合は次のフェーズに移行する
             phase = 5;
           }else{
+            Angle_Goal = CalculateAngle(GOAL_lng, GOAL_lat, gps_longitude, gps_latitude);
             //　ここにお願い！
 
 
+            delay(100);
+            forward();
+            delay(1000);
+            stoppage();
           }
         break;
         }
