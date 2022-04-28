@@ -148,6 +148,7 @@ double previous_Millis;
 SR04 sr04 = SR04(ECHO_PIN, TRIG_PIN);
 int forward_phase = 1;
 unsigned long previousMillis = 0;
+unsigned long nowmillis = 0;
 int Priviousdistance;
 int i = 255;
 unsigned long time1;
@@ -957,6 +958,7 @@ void loop()
           nowmillis = millis();
           sum_latitude = 0.0;
           sum_longitude = 0.0;
+          sum_count = 0;
           while(millis() - nowmillis > 3000){
             // GPS
             char c = Serial1.read(); // GPSチップからのデータを受信
@@ -965,91 +967,21 @@ void loop()
             sum_longitude += gps.location.lng();       
             sum_count++;
           }
-          sum_count = 0;
-          gps_latitude = sum_latitude/3;
-          gps_longitude = sum_longitude/3;
-          
+          gps_latitude = sum_latitude/sum_count;
+          gps_longitude = sum_longitude/sum_count;
 
           CurrentDistance = CalculateDis(GOAL_lng, GOAL_lat, gps_longitude, gps_latitude);
           Serial.print("CurrentDistance=");
           Serial.println(CurrentDistance);
 
-          if (desiredDistance >= CurrentDistance)
-          {
+          if (2.0 >= CurrentDistance || ){
             // カラーコーンとの距離が理想値よりも小さい場合は次のフェーズに移行する
             phase = 5;
           }else{
-            delay(100);
-            accel();
-            forward();
-            delay(1000);
-            stopping();
-            // Goalまでの偏角を計算する
-            Angle_Goal = CalculateAngle(GOAL_lng, GOAL_lat, gps_longitude, gps_latitude);
+            //　ここにお願い！
 
-            Sum_headingDegrees = 0.0;
-              for (i = 0; i < 15; i++){
-                delay(10);
-                Vector norm = compass.readNormalize();
-                heading = atan2(norm.YAxis, norm.XAxis);
-                declinationAngle = (-7.0 + (46.0 / 60.0)) / (180 / PI);
-                heading += declinationAngle;
-                if (heading < 0){
-                  heading += 2 * PI;
-                }
-                if (heading > 2 * PI){
-                  heading -= 2 * PI;
-                }
 
-                // Convert to degrees
-                headingDegrees = heading * 180 / M_PI;
-
-                if (headingDegrees < 0){
-                  headingDegrees += 360;
-                }
-
-                if (headingDegrees > 360){
-                  headingDegrees -= 360;
-                }
-                Sum_headingDegrees += headingDegrees;
-              }
-              Angle_gy270 = Sum_headingDegrees / 15;
-        }
-        // どちらに回ればいいか計算
-          rrAngle = -Angle_gy270 + Angle_Goal;
-          if (rrAngle < 0){
-            rrAngle += 360;
           }
-          if (rrAngle > 360){
-            rrAngle -= 360;
-          }
-          llAngle = Angle_gy270 - Angle_Goal;
-          if (llAngle < 0){
-            llAngle += 360;
-          }
-          if (llAngle > 360){
-            llAngle -= 360;
-          }
-
-        if (rrAngle > llAngle){
-          //反時計回り
-          if (llAngle > 20){
-            leftturn();
-            delay(100);
-            rotating();
-            delay(400);
-            stoppage();
-          }
-        }else{
-          //時計回り
-          if (rrAngle > 20){
-            rightturn();
-            delay(100);
-            reverse_rotating();
-            delay(400);
-            stoppage();
-          }
-        }
         break;
         }
 
