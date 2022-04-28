@@ -1012,7 +1012,7 @@ void loop()
               headingDegrees -= 360;
             }
   
-            while(fabs(headingDegrees - Angle_Goal)<10){
+            while(fabs(headingDegrees - Angle_Goal)>10){
               Vector norm = compass.readNormalize();
               heading = atan2(norm.YAxis, norm.XAxis);
               declinationAngle = (-7.0 + (46.0 / 60.0)) / (180 / PI);
