@@ -856,7 +856,7 @@ void loop()
           if (desiredDistance >= CurrentDistance)
           {
             // カラーコーンとの距離が理想値よりも小さい場合は次のフェーズに移行する
-            phase = 5;
+            phase = 0;
           }else{
             delay(100);
             accel();
