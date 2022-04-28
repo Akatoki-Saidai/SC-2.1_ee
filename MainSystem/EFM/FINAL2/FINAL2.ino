@@ -224,27 +224,27 @@ double CalculateAngle(double GOAL_lng, double GOAL_lat, double gps_longitude, do
 void forward()
 {
   ledcWrite(0, 0); // channel, duty
-  ledcWrite(1, 127);
+  ledcWrite(1, 255);
   ledcWrite(2, 0);
-  ledcWrite(3, 107);
+  ledcWrite(3, 235);
 }
 
-//ターボ
+/*//ターボ
 void turbo()
 {
   ledcWrite(0, 0); // channel, duty
   ledcWrite(1, 255);
   ledcWrite(2, 0);
   ledcWrite(3, 235);
-}
+}*/
 
 //後転
 void back()
 {
   ledcWrite(0, 0);
-  ledcWrite(1, 63);
+  ledcWrite(1, 127);
   ledcWrite(2, 0);
-  ledcWrite(3, 63);
+  ledcWrite(3, 127);
 }
 
 //停止
@@ -261,14 +261,14 @@ void leftturn()
 {
   ledcWrite(0, 0);
   ledcWrite(1, 0);
-  ledcWrite(2, 127);
+  ledcWrite(2, 255);
   ledcWrite(3, 0);
 }
 
 //左旋回
 void rightturn()
 {
-  ledcWrite(0, 127);
+  ledcWrite(0, 255);
   ledcWrite(1, 0);
   ledcWrite(2, 0);
   ledcWrite(3, 0);
@@ -278,8 +278,8 @@ void rightturn()
 void rotating()
 {
   ledcWrite(0, 0);
-  ledcWrite(1, 70);
-  ledcWrite(2, 70);
+  ledcWrite(1, 140);
+  ledcWrite(2, 140);
   ledcWrite(3, 0);
 }
 
@@ -287,24 +287,24 @@ void rotating()
 void slow_rotating()
 {
   ledcWrite(0, 0);
-  ledcWrite(1, 45);
-  ledcWrite(2, 45);
+  ledcWrite(1, 90);
+  ledcWrite(2, 90);
   ledcWrite(3, 0);
 }
 
 //反回転
 void reverse_rotating()
 {
-  ledcWrite(0, 70);
+  ledcWrite(0, 140);
   ledcWrite(1, 0);
   ledcWrite(2, 0);
-  ledcWrite(3, 70);
+  ledcWrite(3, 140);
 }
 
 //ゆっくり加速
 void accel()
 {
-  for (int i = 0; i < 127; i = i + 5)
+  for (int i = 0; i < 255; i = i + 5)
   {
     ledcWrite(0, 0);
     ledcWrite(1, i);
@@ -317,7 +317,7 @@ void accel()
 //ゆっくり停止
 void stopping()
 {
-  for (int i = 127; i > 0; i = i - 5)
+  for (int i = 255; i > 0; i = i - 5)
   {
     ledcWrite(0, 0);
     ledcWrite(1, i);
