@@ -10,7 +10,7 @@ double aX, aY, aZ, aSqrt, gX, gY, gZ, mDirection, mX, mY, mZ;
 DFRobot_QMC5883 compass;
 TinyGPSPlus gps;
 
-int phase = 4;
+int phase = 0;
 char key = '0';
 const int SAMPLING_RATE = 200;
 int phase_state = 0;
@@ -93,8 +93,8 @@ double sum_longitude = 0;
 
 
 // you need to set up variables at first
-double GOAL_lat = 35.860595000;
-double GOAL_lng = 139.606911667;
+double GOAL_lat = 35.860576667;
+double GOAL_lng = 139.606981667;
 
 // variables___GPS
 //緯度
@@ -961,7 +961,7 @@ void loop()
           sum_latitude = 0.0;
           sum_longitude = 0.0;
           sum_count = 0;
-          while(millis() - nowmillis > 3000){
+          while(millis() - nowmillis < 3000){
             // GPS
             char c = Serial1.read(); // GPSチップからのデータを受信
             gps.encode(c);           // GPSチップからのデータの整形
@@ -972,11 +972,17 @@ void loop()
           gps_latitude = sum_latitude/sum_count;
           gps_longitude = sum_longitude/sum_count;
 
+          Serial.print(gps_latitude, 9);
+          Serial.print(",");
+          Serial.print(gps_longitude, 9);
+          Serial.print(",");
+
           CurrentDistance = CalculateDis(GOAL_lng, GOAL_lat, gps_longitude, gps_latitude);
           Serial.print("CurrentDistance=");
           Serial.println(CurrentDistance);
 
-          if (2.0 >= CurrentDistance || ultra_distance < 600 && (ultra_distance != 0)){
+          ultra_distance = sr04.Distance();
+          if (2.0 >= CurrentDistance || (ultra_distance < 600 && ultra_distance != 0)){
             // カラーコーンとの距離が理想値よりも小さい場合は次のフェーズに移行する
             phase = 5;
           }else{
@@ -984,31 +990,30 @@ void loop()
 
             // ゆっくり回転開始
             slow_rotating();
-            
-            Vector norm = compass.readNormalize();
-            heading = atan2(norm.YAxis, norm.XAxis);
-            declinationAngle = (-7.0 + (46.0 / 60.0)) / (180 / PI);
-            heading += declinationAngle;
-            if (heading < 0){
-              heading += 2 * PI;
-            }
-            if (heading > 2 * PI){
-              heading -= 2 * PI;
-            }
-            // Convert to degrees
-            headingDegrees = heading * 180 / M_PI;
-
-            if (headingDegrees < 0){
-              headingDegrees += 360;
-            }
-
-            if (headingDegrees > 360){
-              headingDegrees -= 360;
-            }
-
-            if(fabs(headingDegrees - Angle_Goal)<10){
-              stoppage();
-            }
+  
+            while(fabs(headingDegrees - Angle_Goal)<10){
+              Vector norm = compass.readNormalize();
+              heading = atan2(norm.YAxis, norm.XAxis);
+              declinationAngle = (-7.0 + (46.0 / 60.0)) / (180 / PI);
+              heading += declinationAngle;
+              if (heading < 0){
+                heading += 2 * PI;
+              }
+              if (heading > 2 * PI){
+                heading -= 2 * PI;
+              }
+              // Convert to degrees
+              headingDegrees = heading * 180 / M_PI;
+  
+              if (headingDegrees < 0){
+                headingDegrees += 360;
+              }
+  
+              if (headingDegrees > 360){
+                headingDegrees -= 360;
+              }
+             }
+             stoppage();
 
             //少し進む(ここにお願い!)
             delay(100);
